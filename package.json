@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host  192.168.1.126",
+    "dev": "vite --host 192.168.1.14",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.6.7",
     "vue": "^3.4.15"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@
 </script>
 
 <template>
-  <div class="card bordered shadow-lg w-25">
+  <div class="card bordered shadow-lg w-50">
     <div class="card-body">
         <div class="flex flex-col gap-4 w-52">
             <div class="skeleton h-32 w-full"></div>

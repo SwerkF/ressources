@@ -1,46 +1,27 @@
 <script setup lang="ts">
 import SingleItem from './SingleItem.vue'
 import SkeletonCard from './SkeletonCard.vue'
-const items = [
-    {
-        title: 'Item 1',
-        description: 'Description 1',
-        image: 'https://source.unsplash.com/1600x900/?ui,ux',
-        link: 'https://www.google.com'
-    },
-    {
-        title: 'Item 2',
-        description: 'Description 2',
-        image: 'https://source.unsplash.com/1600x900/?ui,ux',
-        link: 'https://www.google.com'
-    },
-    {
-        title: 'Item 3',
-        description: 'Description 3',
-        image: 'https://source.unsplash.com/1600x900/?ui,ux',
-        link: 'https://www.google.com'
-    },
-    {
-        title: 'Item 4',
-        description: 'Description 4',
-        image: 'https://source.unsplash.com/1600x900/?ui,ux',
-        link: 'https://www.google.com'
-    },
-    {
-        title: 'Item 5',
-        description: 'Description 5',
-        image: 'https://source.unsplash.com/1600x900/?ui,ux',
-        link: 'https://www.google.com'
-    },
-    {
-        title: 'Item 6',
-        description: 'Description 6',
-        image: 'https://source.unsplash.com/1600x900/?ui,ux',
-        link: 'https://www.google.com'
-    }
-]
-
-let response:any = items;
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+// axios request
+const response = ref(null)
+onMounted(async () => {
+    axios.get('http://localhost:3000/api/ressources', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }
+    })
+    .then((res:any) => {
+        console.log(res.data)
+        setTimeout(() => { 
+            response.value = res.data
+        }, 2000)
+    })
+    .catch((err:any) => {
+        console.log(err)
+    })
+})
 
 
 </script>
@@ -64,8 +45,9 @@ let response:any = items;
             <SkeletonCard />
         </div>
         <div v-else class="flex flex-wrap justify-center gap-6">
-            <SingleItem v-for="item in response" :key="item.title" :title="item.title" :description="item.description" :image="item.image" :link="item.link" />
+            <SingleItem v-for="item in response" :key="item.id" :title="item.nom" :description="item.description" />
         </div>
+        
     </div>
     <dialog id="my_modal_1" class="modal">
         <div class="modal-box w-50 max-w-7xl">
