@@ -1,6 +1,3 @@
-const db = require('../db/db');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const Ressource = require('../models/ressource');
 const Categorie = require('../models/categorie');
 require('dotenv').config();

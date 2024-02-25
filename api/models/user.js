@@ -1,24 +1,29 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../db/db');
 
-const Ressource = sequelize.define('ressource', {
-    idressource: {
+const User = sequelize.define('user', {
+    iduser: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
-    nom: {
+    username: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    short_description: {
+    email: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    description: {
-        type: Sequelize.TEXT,
+    password: {
+        type: Sequelize.STRING,
         allowNull: false
     },
+    role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'user'
+    }
 });
 
-module.exports = Ressource;
+module.exports = User;

@@ -14,12 +14,17 @@ app.use(cors());
 
 // Require & Import API routes
 const databaseRoutes = require('./routes/database');
-const users = require('./routes/users');
-const ressourcesRouter = require('./routes/ressource'); // Import the router, not the file itself
+const usersRoutes = require('./routes/users');
+const ressourcesRouter = require('./routes/ressource'); 
+const categoriesRouter = require('./routes/categorie');
+const elementRouter = require('./routes/element');
 
 // Use API Routes
 app.use('/api/database', databaseRoutes);
-app.use('/api/ressources', ressourcesRouter); // Use the router as middleware
+app.use('/api/ressources', ressourcesRouter); 
+app.use('/api/users', usersRoutes);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/elements', elementRouter);
 
 // Listen to port 3000
 app.listen(3000, () => {

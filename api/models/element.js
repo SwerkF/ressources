@@ -1,24 +1,24 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../db/db');
+const Ressource = require('./ressource');
 
-const Ressource = sequelize.define('ressource', {
-    idressource: {
+const Element = sequelize.define('element', {
+    idelement: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
-    nom: {
+    type: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    short_description: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    description: {
+    content: {
         type: Sequelize.TEXT,
         allowNull: false
-    },
+    }
 });
 
-module.exports = Ressource;
+Element.belongsTo(Ressource, { foreignKey: 'idressource' });
+Ressource.hasMany(Element, { foreignKey: 'idressource' });
+
+module.exports = Element;
