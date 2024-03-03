@@ -11,7 +11,10 @@ exports.getListRessources = async (req, res, next) => {
                 through: {
                     attributes: []
                 }
-            }]
+                
+            }],
+            offset: parseInt(req.query.skip) || 0,
+            limit: parseInt(req.query.limit) || 6
         });
         res.status(200).json(ressources);
     } catch (error) {

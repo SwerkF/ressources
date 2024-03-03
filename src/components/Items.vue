@@ -13,8 +13,11 @@ const selectedItem = ref({
     image: '',
     link: ''
 })
+
+let skip = ref(0)
 onMounted(async () => {
-    await axios.get('http://localhost:3000/api/ressources', {
+    console.log('http://localhost:3000/api/ressources?skip=' + skip.value)
+    await axios.get('http://localhost:3000/api/ressources?skip=' + skip.value, {
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
