@@ -18,6 +18,7 @@ const usersRoutes = require('./routes/users');
 const ressourcesRouter = require('./routes/ressource'); 
 const categoriesRouter = require('./routes/categorie');
 const elementRouter = require('./routes/element');
+const subcategoriesRouter = require('./routes/subcategorie');
 
 // Use API Routes
 app.use('/api/database', databaseRoutes);
@@ -25,6 +26,7 @@ app.use('/api/ressources', ressourcesRouter);
 app.use('/api/users', usersRoutes);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/elements', elementRouter);
+app.use('/api/subcategories', subcategoriesRouter);
 
 // Listen to port 3000
 app.listen(3000, () => {

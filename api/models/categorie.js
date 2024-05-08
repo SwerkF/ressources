@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../db/db');
-const Ressource = require('./ressource');
+const SubCategories = require('./subcategorie');
 
 const Categorie = sequelize.define('categorie', {
     idcategorie: {
@@ -14,7 +14,8 @@ const Categorie = sequelize.define('categorie', {
     },
 });
 
-Categorie.belongsToMany(Ressource, { through: 'ressource_categorie' });
-Ressource.belongsToMany(Categorie, { through: 'ressource_categorie' });
+Categorie.hasMany(SubCategories, { foreignKey: 'idcategorie' });
+SubCategories.belongsTo(Categorie, { foreignKey: 'idcategorie' });
+
 
 module.exports = Categorie;

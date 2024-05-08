@@ -26,11 +26,11 @@ const handleButtonClick = () => {
 </script>
 
 <template>
-  <div class="card bordered shadow-lg w-50">
+  <div class="card bordered shadow-lg w-50 max-h-80">
     <div class="card-body">
       <img :src="Image1" alt="image" class="w-full h-32 object-cover rounded-lg">
       <h2 class="card-title text-lg font-bold mt-4">{{ props.title }}</h2>
-      <p class="text-base mt-2">{{ props.description }}</p>
+      <p class="text-sm mt-2">{{ props.description.substring(0, 30) }}...</p>
       <button class="btn btn-primary mt-4" onclick="my_modal_1.showModal()" @click="handleButtonClick">Voir</button>
     </div>
   </div>

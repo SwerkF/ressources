@@ -11,7 +11,8 @@ const selectedItem = ref({
     title: '',
     description: '',
     image: '',
-    link: ''
+    link: '',
+    elements: []
 })
 
 let skip = ref(0)
@@ -37,6 +38,7 @@ onMounted(async () => {
         }
     })
     .then((res:any) => {
+        console.log(res.data)
         categories.value = res.data
     })
     .catch((err:any) => {
@@ -46,17 +48,41 @@ onMounted(async () => {
 })
 
 const handleShowModal = (data:any) => {
+    console.log(data)
   selectedItem.value = data;
 }
 
 const filterCategory = (category:any) => {
-    console.log(items.value)
-    let filteredItems = items.value.filter((item:any) => {
-        // items contaisn multiple categories
-        return item.categories.includes(category.id)
-    })
-
-    items.value = filteredItems
+    if(category == "All") {
+        axios.get('http://localhost:3000/api/ressources?skip=' + skip.value, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+        .then((res:any) => {
+            console.log(res.data)
+            items.value = res.data
+        })
+        .catch((err:any) => {
+            console.log(err)
+        })
+        return
+    } else {
+        console.log(category.idcategorie)
+        axios.get('http://localhost:3000/api/ressources/category/' + category.idcategorie, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+        .then((res:any) => {
+            items.value = res.data
+        })
+        .catch((err:any) => {
+            console.log(err)
+        })
+    }
 }
 
 </script>
@@ -64,8 +90,15 @@ const filterCategory = (category:any) => {
 <template>
     <div class="flex flex-col xl:flex-row gap-6 border-opacity-50">
         <div class="flex flex-row flex-wrap xl:flex-col xl:justify-start justify-center gap-2 xl:w-48">
-            <button class="btn btn-primary">All</button>
-            <button v-for="category in categories" :key="category.id" class="btn btn-ghost" @click="filterCategory(category)">{{ category.nom }}</button>
+            <button class="btn btn-primary" @click="filterCategory('All')">All</button>
+            <div v-for="category in categories" :key="category.idcategorie">
+                <hr class="border border-gray-300 w-full">
+                <button class="btn btn-ghost"  @click="filterCategory(category)">{{category.nom}}</button>
+   
+                <div v-if="category.subcategories.length > 0" class="flex flex-col gap-2">
+                    <button class="btn btn-ghost btn-sm text-xs" v-for="subcategory in category.subcategories" :key="subcategory.idcategorie" @click="filterCategory(subcategory)">{{subcategory.nom}}</button>
+                </div>  
+            </div>
         </div>
         <div v-if="items === null" class="flex flex-wrap justify-center gap-6">
             <SkeletonCard />
@@ -77,7 +110,7 @@ const filterCategory = (category:any) => {
             <SkeletonCard />
             <SkeletonCard />
         </div>
-        <div v-else class="flex flex-wrap justify-center gap-6">
+        <div v-else class="flex flex-wrap justify-center items-start gap-6">
             <SingleItem v-for="item in items" :key="item.id" :title="item.nom" :description="item.description" @showModal="handleShowModal"/>
         </div>
     </div>
