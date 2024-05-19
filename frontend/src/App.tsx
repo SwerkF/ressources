@@ -6,6 +6,7 @@ import About from './pages/About'
 import Ressources from './pages/Ressources';
 import Connection from './pages/Connection';
 import Navbar from './components/Navbar'
+import Footer from './components/Footer';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/connection" element={<Connection />} />
           </Routes>
+          <Footer />
         </Router>
         
     </Fragment>

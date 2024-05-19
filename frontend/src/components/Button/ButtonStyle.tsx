@@ -16,6 +16,9 @@ const ButtonColorClass = (color: string) => {
         case 'warning':
             return 'bg-yellow-600 text-white dark:bg-yellow-700 dark:hover:bg-yellow-800';
 
+        case 'neutral':
+            return 'bg-gray-200 text-gray-800 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800';
+             
         default:
             return 'bg-blue-600 text-white dark:bg-blue-700 dark:hover:bg-blue-800';
         
