@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @unique
+  bio       String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   Profile?
+  ratings   Rating[]
+}
+
+// Category
+// the model category references different dev ressources like articles, videos, courses. A ressource can have multiple categories
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ressources Ressource[]
+}
+
+// Ressource
+// the model ressource references different dev ressources like articles, videos, courses. A ressource can have multiple categories. 
+// It contains a title, a short description, title image, url
+// ressource can have multiple content
+// ressource can have multiple ratings
+model Ressource {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  image       String
+  url         String
+  categories  Category[]
+  content     Content[]
+  ratings     Rating[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+
+// content
+// the table content reference the different parts of an ressource that will be added on the front side.
+// the content is a type of an html element (h1, h2, p, img, etc) 
+// it is related to a ressource
+
+model Content {
+  id          Int      @id @default(autoincrement())
+  type        String
+  value       String
+  ressource   Ressource @relation(fields: [ressourceId], references: [id])
+  ressourceId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// rating
+// users will be able to rate ressources and comment them
+model Rating {
+  id          Int      @id @default(autoincrement())
+  rating      Int
+  comment     String?
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  ressource   Ressource @relation(fields: [ressourceId], references: [id])
+  ressourceId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
