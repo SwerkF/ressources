@@ -2,9 +2,9 @@
 import { ButtonColorClass, ButtonWidthClass, ButtonSizeClass } from './ButtonStyle';
 
 const Button = (props:any) => {
-    // props: color, size, width, text, icon, onClick
+    // props: color, size, width, text, icon, onClick, active
 
-    const colorClass = ButtonColorClass(props.color);
+    const colorClass = ButtonColorClass(props.color, props.active ? true : false);
     const sizeClass = ButtonSizeClass(props.size);
     const widthClass = ButtonWidthClass(props.width);
 

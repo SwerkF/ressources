@@ -1,11 +1,21 @@
 import express from 'express';
+import cors from 'cors';
 import userRoutes from './src/routes/userRoutes';
+import ressourceRoutes from './src/routes/ressourceRoutes';
+import categoryRoutes from './src/routes/categoryRoutes';
+import contentRoutes from './src/routes/contentRoutes';
 
 const app = express();
 
 app.use(express.json());
+app.use(cors({
+  origin: '*'
+}));
 
 app.use('/api/users', userRoutes);
+app.use('/api/ressources', ressourceRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/content', contentRoutes);
 
 app.use((err:any, req:any, res:any, next:any) => {
   console.error(err.stack);

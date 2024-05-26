@@ -1,27 +1,9 @@
 import { Ressource } from "../../types/Ressource";
 import Badge from "../Badge/Badge";
 import CategoryBadge from "../Badge/CategoryBadge";
+import Button from "../Button/Button";
 
-/*
-        <div className="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-neutral-700/70">
-            <img className="w-full h-auto rounded-t-xl" src="https://images.unsplash.com/photo-1680868543815-b8666dba60f7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2532&q=80" alt="Image Description" />
-            <div className="p-4 md:p-5">
-                <h3 className="text-lg font-bold text-gray-800 dark:text-white">
-                Card title
-                </h3>
-                // Category Badge. If more than 2 categories, show only 2 and a +{remaining} badge
-                <p className="mt-1 text-gray-500 dark:text-neutral-400">
-                Some quick example text to build on the card title and make up the bulk of the card's content.
-                </p>
-                <p className="mt-5 text-xs text-gray-500 dark:text-neutral-500">
-                Last updated 5 mins ago
-                </p>
-            </div>
-        </div>
-        */
-       
-
-const RessourceCard = ({ ressource }: { ressource: Ressource }) => {
+const RessourceCard = ({ ressource, onClick }:  { ressource: Ressource, onClick: (ressource: Ressource) => void }) => {
 
     const handleDateCalc = (date: string) => {
 
@@ -51,13 +33,11 @@ const RessourceCard = ({ ressource }: { ressource: Ressource }) => {
         } else {
             return `${seconds} seconds ago`;
         }
-
-        
     }
 
     return (
         <div className="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-neutral-700/70">
-            <img className="w-auto max-h-60 object-cover rounded-t-xl" src={ressource.image} alt={ressource.title} />
+            <img className="w-auto min-h-60 object-cover rounded-t-xl" src={ressource.image} alt={ressource.title} />
             <div className="p-4 md:p-5">
                 <h3 className="text-lg font-bold text-gray-800 dark:text-white">
                     {ressource.title}
@@ -74,6 +54,9 @@ const RessourceCard = ({ ressource }: { ressource: Ressource }) => {
                             )
                         )
                     ))}
+                </div>
+                <div className="mt-4">
+                    <Button onClick={() => { onClick(ressource) }} className="mt-3" color="primary" size="sm" text="View ressource"></Button>
                 </div>
                 <p className="mt-5 text-xs text-gray-500 dark:text-neutral-500">
                     Published {handleDateCalc(ressource.createdAt)}
