@@ -22,24 +22,26 @@ const Ressources = () => {
     const fetchRessources = async (urlSearch?: string,urlCategory?: string) => {
         
         setLoading(true);
-        try {
-            let geturl = `http://localhost:3000/api/ressources?`;
-
-            urlSearch ? (geturl += `search=${urlSearch}&`) : search && (geturl += `search=${search}&`);
-            urlCategory ? (geturl += `category=${urlCategory}&`) : selectedCategory && (geturl += `category=${selectedCategory}&`);
-            take && (geturl += `take=${take}&`);
-            skip && (geturl += `skip=${skip}&`);
-            
-            const response = await fetch(geturl);
-            const data = await response.json();
-            console.log(data);
-            setRessources(data.data);
-            setTotalRessources(data.count);
-            setLoading(false);
-            firstLoad && setFirstLoad(false);
-        } catch (error) {
-            console.log(error);
-        }
+        setTimeout(async () => {
+            try {
+                let geturl = `http://localhost:3000/api/ressources?`;
+    
+                urlSearch ? (geturl += `search=${urlSearch}&`) : search && (geturl += `search=${search}&`);
+                urlCategory ? (geturl += `category=${urlCategory}&`) : selectedCategory && (geturl += `category=${selectedCategory}&`);
+                take && (geturl += `take=${take}&`);
+                skip && (geturl += `skip=${skip}&`);
+                
+                const response = await fetch(geturl);
+                const data = await response.json();
+                console.log(data);
+                setRessources(data.data);
+                setTotalRessources(data.count);
+                setLoading(false);
+                firstLoad && setFirstLoad(false);
+            } catch (error) {
+                console.log(error);
+            }
+        }, 500);
     }
 
     const fetchCategories = async () => {
@@ -53,7 +55,6 @@ const Ressources = () => {
     };
 
     useEffect(() => {
-        setLoading(true);
         if(firstLoad) {
             const params = new URLSearchParams(window.location.search);
             const urlSearch = params.get('search') || '';

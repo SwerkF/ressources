@@ -59,6 +59,7 @@ model Ressource {
   categories  Category[]
   content     Content[]
   ratings     Rating[]
+  progress    Int?      @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }

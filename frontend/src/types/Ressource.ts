@@ -9,6 +9,7 @@ export interface Ressource {
     url: string;
     categories: Category[];
     content: Content[];
+    progress: number;
     //ratings: Rating[];
     createdAt: string;
     updatedAt: string;

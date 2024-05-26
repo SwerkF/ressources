@@ -16,6 +16,7 @@ export const getRessources = async (req: Request, res: Response) => {
             description: true,
             image: true,
             url: true,
+            progress: true,
             createdAt: true,
             categories: {
                 select: {
@@ -53,6 +54,7 @@ export const getRessource = async (req: Request, res: Response) => {
             description: true,
             image: true,
             url: true,
+            progress: true,
             createdAt: true,
             categories: {
                 select: {

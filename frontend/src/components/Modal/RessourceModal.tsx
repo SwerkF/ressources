@@ -3,6 +3,7 @@ import { Ressource } from "../../types/Ressource";
 import CodeBlock from "../Blocks/CodeBlock";
 import ImageBlock from "../Blocks/ImageBlock";
 import { Content } from "../../types/Content";
+import Progress from "../Progress";
 
 const RessourceModal = ({ show, handleClose, ressource }: { show: boolean, handleClose: () => void, ressource: Ressource }) => {
 
@@ -14,6 +15,7 @@ const RessourceModal = ({ show, handleClose, ressource }: { show: boolean, handl
                 const response = await fetch(`http://localhost:3000/api/content/${ressource.id}`);
                 const data = await response.json();
                 setContent(data);
+                console.log(ressource);
             } catch (error) {
                 console.log(error);
             }
@@ -33,8 +35,11 @@ const RessourceModal = ({ show, handleClose, ressource }: { show: boolean, handl
                     <div className="bg-white dark:bg-neutral-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="sm:flex justify-center sm:items-start">
                             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <div className="">
+                                <div className="img-fluid">
                                     <img src={ressource.image} alt={ressource.title} className="w-full h-60 object-cover rounded-lg" />
+                                </div>
+                                <div className="progress mt-3">
+                                    <Progress progress={ressource.progress} />
                                 </div>
                                 <h3 className="text-3xl mt-5 leading-6 font-medium text-gray-900 dark:text-white" id="modal-headline mt-4">
                                     {ressource.title}
