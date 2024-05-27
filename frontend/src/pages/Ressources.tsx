@@ -110,7 +110,7 @@ const Ressources = () => {
                 ))}
             </div>
             <div className="flex justify-center mt-6">
-                {Array.from({length: Math.ceil(totalRessources / take)}, (_, i) => (
+                {!loading && Array.from({length: Math.ceil(totalRessources / take)}, (_, i) => (
                     <Button key={i} size="sm" color="neutral" onClick={() => handleSkip(i + 1)} text={i + 1} active={i + 1 == (skip / take) + 1}></Button>
                 ))}
             </div>

@@ -1,18 +1,25 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ThemeSwitch from './ThemeSwitch';
 import Button from './Button/Button';
 import NavbarLink from './NavbarLink';
+import { UserContext } from '../App';
 
 const Navbar = () => {
 
     const [current, setCurrent] = useState('home');
+    const user = useContext(UserContext);
 
     useEffect(() => {
         const path = window.location.pathname;
         const currentPath = path.split('/')[1];
         setCurrent(currentPath);
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        window.location.href = '/';
+    }
 
     return (
         <header className="flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full py-7">
@@ -28,8 +35,25 @@ const Navbar = () => {
                 <div className="flex items-center gap-x-2 ms-auto py-1 md:ps-6 md:order-3 md:col-span-3">
                     
                     <ThemeSwitch />
-                    <Button color="primary" size="sm" text="Sign In" />
-                    <Button color="secondary" size="sm" text="Sign Up" />
+                    {!user ? (
+                        <div className="flex flex-row gap-3">
+                            <Link to="/login">        
+                                <Button color="primary" size="sm" text="Sign In" />
+                            </Link>
+                            <Link to="/register">
+                                <Button color="secondary" size="sm" text="Sign Up" />
+                            </Link>
+                        </div>
+                    ) : (
+                        // display avatar on left, username on right and under username, logout button
+                        <div className="flex flex-row items-center gap-3">
+                            <img src={(user as any).profile.image} alt="avatar" className="w-8 h-8 rounded-full" />
+                            <div className="flex flex-col items-start">
+                                <span className="text-sm font-semibold dark:text-white">{(user as any).name}</span>
+                                <button className="text-sm font-semibold dark:text-white" onClick={handleLogout}>Disconnect</button>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="md:hidden">
                         <button type="button" className="hs-collapse-toggle size-[38px] flex justify-center items-center text-sm font-semibold rounded-xl border border-gray-200 text-black hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:border-neutral-700 dark:hover:bg-neutral-700" data-hs-collapse="#navbar-collapse-with-animation" aria-controls="navbar-collapse-with-animation" aria-label="Toggle navigation">

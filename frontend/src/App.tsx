@@ -1,31 +1,53 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect, createContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Home from './pages/Home'
 import About from './pages/About'
 import Ressources from './pages/Ressources';
-import Connection from './pages/Connection';
 import Navbar from './components/Navbar'
 import Footer from './components/Footer';
+import Login from './pages/Connection';
 
+const UserContext = createContext(null);
 
 function App() {
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log(token);
+    if (token) {
+      fetch('http://localhost:3000/api/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }})
+        .then(response => response.json())
+        .then(data => {
+          setUser(data);
+        })
+    }
+  }, [])
+    
 
   return (
     <Fragment>
         <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/ressources" element={<Ressources />} />
-            <Route path="/connection" element={<Connection />} />
-          </Routes>
-          <Footer />
+          <UserContext.Provider value={user}>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/ressources" element={<Ressources />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+            <Footer />
+          </UserContext.Provider>
         </Router>
-        
     </Fragment>
   )
 }
 
 export default App
+
+export { UserContext }
