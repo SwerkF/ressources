@@ -1,11 +1,26 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { UserContext } from "../App";
+import { useNavigate } from "react-router-dom";
+import PasswordModal from "../components/Modal/PasswordModal";
+import Button from "../components/Button/Button";
 
 const Profile = () => {
     
-    const user:any = useContext(UserContext);
+    const { user } = useContext(UserContext) as any;
+    const { setUser } = useContext(UserContext) as any;
+    const navigate = useNavigate();
 
     const [userProfile, setUserProfile] = useState(user);
+    const [show, setShow] = useState(false);
+
+    useEffect(() => {
+        if (!localStorage.getItem('token')) {
+            navigate('/login');
+        };
+
+        setUserProfile(user);
+        console.log(user);
+    }, [user])
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -21,7 +36,7 @@ const Profile = () => {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            setUser(data);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -43,24 +58,28 @@ const Profile = () => {
                             <div className="grid grid-cols-1 gap-6">
                                 <div className="flex flex-col items-start">
                                     <label className="text-gray-700 dark:text-neutral-300" htmlFor="name">Name</label>
-                                    <input type="text" id="name" name="name" value={userProfile && userProfile.name} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />
+                                    <input type="text" id="name" name="name" value={userProfile && userProfile.name} onChange={(e) => setUserProfile({...userProfile, name: e.target.value})} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />
                                 </div>
                                 <div className="flex flex-col items-start">
                                     {userProfile && userProfile.isGoogle ? (
                                         <Fragment>
-                                            <label className="text-gray-700 dark:text-neutral-300" htmlFor="email">Email <span className="text-xs"> (Not editable, connected with Google)</span></label>
+                                            <label className="text-gray-700 dark:text-neutral-300" htmlFor="email">Email <span className="text-xs"> (Compte Google, modification impossible.)</span></label>
                                             <label  className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md  text-left dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring">{userProfile.email}</label>
                                         </Fragment>
                                     ) : (
                                         <Fragment>
                                             <label className="text-gray-700 dark:text-neutral-300" htmlFor="email">Email</label>
-                                            <input type="email" id="email" name="email" value={userProfile && userProfile.email} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />
+                                            <input type="email" id="email" name="email" value={userProfile && userProfile.email} onChange={(e) => setUserProfile({...userProfile, email: e.target.value})} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />                                       
                                         </Fragment>
                                     )}
                                 </div>
                                 <div className="flex flex-col items-start">
+                                    <Button color="neutral" size="sm" text="Changer le mot de passe" onClick={() => { setShow(true) }} />
+                                </div>
+                                <hr className="my-4 border-gray-200 dark:border-neutral-700" />
+                                <div className="flex flex-col items-start">
                                     <label className="text-gray-700 dark:text-neutral-300" htmlFor="bio">Bio</label>
-                                    <textarea id="bio" name="bio" value={user && user.profile} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring"></textarea>
+                                    <textarea id="bio" name="bio" value={userProfile && userProfile.profile.bio} onChange={(e) => setUserProfile({...userProfile, profile: {bio: e.target.value}})} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />
                                 </div>
                                 <div className="flex flex-col items-start">
                                     <label className="text-gray-700 dark:text-neutral-300" htmlFor="image">Image</label>
@@ -78,6 +97,7 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
+            <PasswordModal show={show} handleClose={() => setShow(false)} user={userProfile} />
         </div>
     )
 }

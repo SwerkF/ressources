@@ -8,7 +8,8 @@ import { UserContext } from '../App';
 const Navbar = () => {
 
     const [current, setCurrent] = useState('home');
-    const user = useContext(UserContext);
+    
+    const { user } = useContext(UserContext) as any;
 
     useEffect(() => {
         const path = window.location.pathname;

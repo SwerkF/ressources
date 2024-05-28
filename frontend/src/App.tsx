@@ -24,7 +24,8 @@ function App() {
           Authorization: `Bearer ${token}`
         }})
         .then(response => response.json())
-        .then(data => {
+        .then((data) => {
+          if(data.error) { return localStorage.removeItem('token'); }
           setUser(data);
         })
     }
@@ -34,7 +35,7 @@ function App() {
   return (
     <Fragment>
         <Router>
-          <UserContext.Provider value={user}>
+          <UserContext.Provider value={{user, setUser} as any}>
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
