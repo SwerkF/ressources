@@ -12,8 +12,6 @@ const Login = () => {
     const navigate = useNavigate();
     
     const handleSuccess = (response: any) => {
-        // fetch localhost:3000/api/users/google
-        // with the response.credentials
         console.log(response);
         fetch('http://localhost:3000/api/users/google', {
             method: 'POST',

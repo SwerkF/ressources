@@ -7,6 +7,7 @@ import Ressources from './pages/Ressources';
 import Navbar from './components/Navbar'
 import Footer from './components/Footer';
 import Login from './pages/Connection';
+import Profile from './pages/Profile';
 
 const UserContext = createContext(null);
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/ressources" element={<Ressources />} />
               <Route path="/login" element={<Login />} />
+              <Route path="profile" element={<Profile />} />
             </Routes>
             <Footer />
           </UserContext.Provider>
