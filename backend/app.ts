@@ -16,6 +16,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/ressources', ressourceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/images', express.static('src/images'));
 
 app.use((err:any, req:any, res:any, next:any) => {
   console.error(err.stack);

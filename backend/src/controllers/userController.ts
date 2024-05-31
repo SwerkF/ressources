@@ -161,3 +161,78 @@ export const getProfile = async (req: Request, res: Response) => {
 
   res.json(userProfile);
 }
+
+
+//router.put('/me', authenticateJWT, upload.single('image'), updateProfile);
+export const updateProfile = async (req: Request, res: Response) => {
+  const { user } = req;
+  const { name, email, bio } = req.body;
+  const image = req.file;
+  // get user with profile
+  const userProfile = await prisma.user.findUnique({
+    select : {
+      email: true,
+      name: true,
+      id: true,
+      isGoogle: true,
+      role: true,
+      profile: true
+    },
+    where: { id: user.id }
+  });
+
+  if(!userProfile) return res.status(404).json({ error: 'User not found' });
+
+  // delete old image.
+  if (image && userProfile.profile && userProfile.profile.image) {
+    // check if image is not google image,
+    const googleImage = userProfile.profile.image.includes('googleusercontent');
+    if (!googleImage) {
+      const fs = require('fs');
+      const path = require('path');
+      const oldPath = path.join(__dirname, '..', '..', 'src/images', userProfile.profile.image.split('/').pop());
+      fs.unlinkSync(oldPath);
+    }
+  }
+
+  // rename image uploaded to the new name to user.id + extension
+  if (image) {
+    const fs = require('fs');
+    const path = require('path');
+    const ext = image.mimetype.split('/')[1];
+    const oldPath = path.join(__dirname, '..', '..', 'src/images', image.filename);
+    const newPath = path.join(__dirname, '..', '..', 'src/images', `${user.id}.${ext}`);
+    fs.renameSync(oldPath, newPath);
+    image.filename = `${user.id}.${ext}`;
+  }
+
+  // update user, imageLink is http://localhost:3000/api/images/ + image.filename
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      email,
+      name,
+      profile: {
+        update: {
+          bio,
+          image: image ? `http://localhost:3000/api/images/${image.filename}` : userProfile.profile && userProfile.profile.image ? userProfile.profile.image : null
+        }
+      }
+    }
+  });
+
+  const returnUser = await prisma.user.findUnique({
+    select : {
+      email: true,
+      name: true,
+      id: true,
+      isGoogle: true,
+      role: true,
+      profile: true
+    },
+    where: { id: user.id }
+  });
+
+  res.json(returnUser);
+  
+}
