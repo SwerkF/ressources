@@ -17,10 +17,10 @@ const ImageFormBlock = ({ image, setImage }: { image: string, setImage: (image: 
     };
 
     return (
-        <Fragment>
+        <div className="w-full border-dashed border-2 border-gray-800 p-3 rounded-lg">
             <p className="mb-1 text-xs">Image Block</p>
             <div className="flex flex-col items-center justify-center w-full">
-                <label htmlFor="image" className="w-full max-h-96 bg-gray-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center cursor-pointer">
+                <label htmlFor="image" className="w-full max-h-96 min-h-32 bg-gray-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center cursor-pointer">
                     {preview ? 
                          <div className="img-fluid">
                             <img src={preview} className="w-full h-auto max-h-96 object-cover rounded-lg" />
@@ -31,7 +31,7 @@ const ImageFormBlock = ({ image, setImage }: { image: string, setImage: (image: 
                 </label>
                 <input type="file" id="image" accept="image/*" className="hidden" onChange={handleImageChange} />
             </div>
-        </Fragment>
+        </div>
     );
 };
 

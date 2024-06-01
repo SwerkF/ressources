@@ -1,8 +1,11 @@
 import { useState } from "react";
 import Button from "../components/Button/Button";
-import { Image, TextT } from "@phosphor-icons/react";
+import { Image, TextT, TextHTwo, TextHOne, Trash, Code } from "@phosphor-icons/react";
 import ImageFormBlock from "../components/Blocks/Form/ImageFormBlock";
 import TextFormBlock from "../components/Blocks/Form/TextFormBlock";
+import HOneFormBlock from "../components/Blocks/Form/HOneFormBlock";
+import HTwoFormBlock from "../components/Blocks/Form/HTwoFormBlock";
+import CodeFormBlock from "../components/Blocks/Form/CodeFormBlock";
 import React from "react";
 
 const CreateRessource = () => {
@@ -30,6 +33,10 @@ const CreateRessource = () => {
         console.log(blocks);
     }
 
+    const handleDeleteBlock = (id: number) => {
+        const updatedBlocks = blocks.filter(block => block.id !== id);
+        setBlocks(updatedBlocks);
+    };
 
     return (
         <div className="container mx-auto dark:text-white">
@@ -40,20 +47,22 @@ const CreateRessource = () => {
                     <p>Choose the type of resource</p>
                     <Button text="Add Image" icon={<Image />} color="gray" onClick={() => { handleCreateBlock('image') }} />
                     <Button text="Add Text" icon={<TextT />} color="gray" onClick={() => { handleCreateBlock('text') }} />
+                    <Button text="Add Title" icon={<TextHOne />} color="gray" onClick={() => { handleCreateBlock('title') }} />
+                    <Button text="Add Subtitle" icon={<TextHTwo />} color="gray" onClick={() => { handleCreateBlock('subtitle') }} />
+                    <Button text="Add Code" icon={<Code />} color="gray" onClick={() => { handleCreateBlock('code') }} />
                 </div>
                 <div className="w-full">
-                    {blocks.map(block => {
-                        return (
-                            <div className="mb-5">
-                                {block.type === 'image' ? (
-                                    <ImageFormBlock image={block.value} setImage={(value: string) => handleValueChange(block.id, value)} />
-                                ) : block.type === 'text' ? (
-                                    <TextFormBlock text={block.value} setText={(value: string) => handleValueChange(block.id, value)} />
-                                ) : (
-                                    <p>Block not found</p>
-                                )}
+                    {blocks.map((block, index) => {
+                       return (
+                            <div key={index} className="flex flex-row items-start gap-3 mb-5">
+                                 {block.type === 'image' && <ImageFormBlock image={block.value} setImage={(value: string) => { handleValueChange(block.id, value) }} />}
+                                 {block.type === 'text' && <TextFormBlock text={block.value} setText={(value: string) => { handleValueChange(block.id, value) }} />}
+                                 {block.type === 'title' && <HOneFormBlock title={block.value} setTitle={(value: string) => { handleValueChange(block.id, value) }} />}
+                                 {block.type === 'subtitle' && <HTwoFormBlock title={block.value} setTitle={(value: string) => { handleValueChange(block.id, value) }} />}
+                                 {block.type === 'code' && <CodeFormBlock code={block.value} setCode={(value: string) => { handleValueChange(block.id, value) }} />}
+                                 <Button icon={<Trash />}  color="neutral" onClick={() => { handleDeleteBlock(block.id) }} />
                             </div>
-                        )
+                       )
                     })}
                 </div>
             </div>
