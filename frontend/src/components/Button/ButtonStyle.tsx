@@ -20,6 +20,9 @@ const ButtonColorClass = (color: string, active:boolean) => {
     
             case 'neutral':
                 return 'bg-gray-200 text-gray-800 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800';
+            
+            case 'gray':
+                return 'bg-gray-400 text-gray-800 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700';
                  
             default:
                 return 'bg-blue-600 text-white dark:bg-blue-700 dark:hover:bg-blue-800';

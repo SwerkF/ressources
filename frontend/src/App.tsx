@@ -9,6 +9,8 @@ import Footer from './components/Footer';
 import Login from './pages/Connection';
 import Profile from './pages/Profile';
 
+import CreateRessource from './pages/CreateRessource';
+
 const UserContext = createContext(null);
 
 function App() {
@@ -43,6 +45,7 @@ function App() {
               <Route path="/ressources" element={<Ressources />} />
               <Route path="/login" element={<Login />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="/create-ressource" element={<CreateRessource />} />
             </Routes>
             <Footer />
           </UserContext.Provider>
