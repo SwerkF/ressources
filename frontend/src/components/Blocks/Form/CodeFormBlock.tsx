@@ -20,7 +20,7 @@ const CodeFormBlock = ({ code, setCode }: { code: string, setCode: (code: string
     };
 
     return (
-        <div className="w-full mb-4">
+        <div className="w-full border-dashed border-2 border-gray-800 p-3 rounded-lg">
             <select 
                 value={language} 
                 onChange={handleLanguageChange} 

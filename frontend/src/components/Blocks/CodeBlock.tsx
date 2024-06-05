@@ -1,15 +1,13 @@
-import hljs from 'highlight.js';
-import 'highlight.js/styles/default.css'; // Vous pouvez changer le thème ici
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
+import React from 'react';
 
-const CodeBlock = ({ code, language } : { code:string, language:string }) => {
-    const highlightedCode = hljs.highlight(code, { language }).value;
+const CodeBlock = ({ code, language }: { code: string, language: string }) => {
+    console.log(code);
     return (
-        <pre className="rounded-lg p-4 bg-gray-800 dark:bg-gray-900 text-white">
-            <code
-                className={`language-${language}`}
-                dangerouslySetInnerHTML={{ __html: highlightedCode }}
-            />
-        </pre>
+        <SyntaxHighlighter language={language} style={darcula}>
+            {code}
+        </SyntaxHighlighter>
     );
 };
 

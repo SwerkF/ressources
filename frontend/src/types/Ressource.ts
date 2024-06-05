@@ -2,7 +2,7 @@ import { Category } from './Category';
 import { Content } from './Content';
 
 export interface Ressource {
-    id: number;
+    id?: number;
     title: string;
     description: string;
     image: string;

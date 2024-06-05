@@ -60,23 +60,24 @@ const Profile = () => {
                                     <label className="text-gray-700 dark:text-neutral-300" htmlFor="name">Name</label>
                                     <input type="text" id="name" name="name" value={userProfile && userProfile.name} onChange={(e) => setUserProfile({...userProfile, name: e.target.value})} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />
                                 </div>
-                                <div className="flex flex-col items-start">
-                                    {userProfile && userProfile.isGoogle ? (
-                                        <Fragment>
-                                            <label className="text-gray-700 dark:text-neutral-300" htmlFor="email">Email <span className="text-xs"> (Compte Google, modification impossible.)</span></label>
-                                            <label  className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md  text-left dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring">{userProfile.email}</label>
-                                        </Fragment>
-                                    ) : (
+                                {userProfile && userProfile.isGoogle ? null : (
+                                    <Fragment>
+                                        <div className="flex flex-col items-start">
+                                    
                                         <Fragment>
                                             <label className="text-gray-700 dark:text-neutral-300" htmlFor="email">Email</label>
                                             <input type="email" id="email" name="email" value={userProfile && userProfile.email} onChange={(e) => setUserProfile({...userProfile, email: e.target.value})} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />                                       
                                         </Fragment>
-                                    )}
-                                </div>
-                                <div className="flex flex-col items-start">
-                                    <Button color="neutral" size="sm" text="Changer le mot de passe" onClick={() => { setShow(true) }} />
-                                </div>
-                                <hr className="my-4 border-gray-200 dark:border-neutral-700" />
+                                    
+                                        </div>
+                                        <div className="flex flex-col items-start">
+                                            <Button color="neutral" size="sm" text="Changer le mot de passe" onClick={() => { setShow(true) }} />
+                                        </div>
+                                    </Fragment>
+                                )}
+                                    
+                                
+                                <hr className="border-gray-200 dark:border-neutral-700" />
                                 <div className="flex flex-col items-start">
                                     <label className="text-gray-700 dark:text-neutral-300" htmlFor="bio">Bio</label>
                                     <textarea id="bio" name="bio" value={userProfile && userProfile.profile.bio} onChange={(e) => setUserProfile({...userProfile, profile: {bio: e.target.value}})} className="block w-full px-4 py-2 mt-1 text-gray-700 bg-white border border-gray-600 rounded-md dark:bg-neutral-800 dark:text-neutral-100 focus:border-blue-500 focus:outline-none focus:ring" />
