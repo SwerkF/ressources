@@ -1,0 +1,69 @@
+import { useState } from 'react';
+import Button from '../Button/Button';
+import { Image, TextT, TextHTwo, TextHOne, Trash, Code } from '@phosphor-icons/react';
+import ImageFormBlock from '../Blocks/Form/ImageFormBlock';
+import TextFormBlock from '../Blocks/Form/TextFormBlock';
+import HOneFormBlock from '../Blocks/Form/HOneFormBlock';
+import HTwoFormBlock from '../Blocks/Form/HTwoFormBlock';
+import CodeFormBlock from '../Blocks/Form/CodeFormBlock';
+
+const CreateRessourceStepTwo = ({ressource, setRessource} : any) => {
+
+    const [blocks, setBlocks] = useState<any[]>([]);
+    const [nextId, setNextId] = useState(1);
+
+    const handleCreateBlock = (type: string) => {
+        const newBlock = {
+            id: nextId,
+            type: type,
+            value: ""
+        };
+        setBlocks([...blocks, newBlock]);
+        setNextId(nextId + 1);
+        setRessource({ ...ressource, content: [...ressource.content, newBlock] });
+    };
+
+    const handleValueChange = (id: number, value: string) => {
+        const updatedBlocks = blocks.map(block => 
+            block.id === id ? { ...block, value: value } : block
+        );
+        setBlocks(updatedBlocks);
+        setRessource({ ...ressource, content: updatedBlocks });
+    };
+
+    const handleDeleteBlock = (id: number) => {
+        const updatedBlocks = blocks.filter(block => block.id !== id);
+        setBlocks(updatedBlocks);
+        setRessource({ ...ressource, content: updatedBlocks });
+    };
+
+
+    return (
+        <div className="w-full flex flex-row gap-3">
+            <div className="w-[20%] flex flex-col gap-2">
+                <p>Choose the type of block</p>
+                <Button text="Add Image" icon={<Image />} color="gray" onClick={() => { handleCreateBlock('image') }} />
+                <Button text="Add Text" icon={<TextT />} color="gray" onClick={() => { handleCreateBlock('text') }} />
+                <Button text="Add Title" icon={<TextHOne />} color="gray" onClick={() => { handleCreateBlock('title') }} />
+                <Button text="Add Subtitle" icon={<TextHTwo />} color="gray" onClick={() => { handleCreateBlock('subtitle') }} />
+                <Button text="Add Code" icon={<Code />} color="gray" onClick={() => { handleCreateBlock('code') }} />
+            </div>
+            <div className={`${blocks.length > 0 ? "w-[70%]" : "w-[60%]"} flex flex-col gap-3`}>
+            {blocks.length > 0 ? blocks.map((block, index) => {
+                return (
+                    <div key={index} className="flex flex-row items-start gap-3 mb-5">
+                        {block.type === 'image' && <ImageFormBlock image={block.value} setImage={(value: string) => { handleValueChange(block.id, value) }} />}
+                        {block.type === 'text' && <TextFormBlock text={block.value} setText={(value: string) => { handleValueChange(block.id, value) }} />}
+                        {block.type === 'title' && <HOneFormBlock title={block.value} setTitle={(value: string) => { handleValueChange(block.id, value) }} />}
+                        {block.type === 'subtitle' && <HTwoFormBlock title={block.value} setTitle={(value: string) => { handleValueChange(block.id, value) }} />}
+                        {block.type === 'code' && <CodeFormBlock code={block.value} setCode={(value: string) => { handleValueChange(block.id, value) }} />}
+                        <Button icon={<Trash />} color="neutral" onClick={() => { handleDeleteBlock(block.id) }} />
+                    </div>
+                )
+            }) : <p className='text-center'>No blocks added</p>}    
+            </div>
+        </div>
+    )
+}
+
+export default CreateRessourceStepTwo;

@@ -255,7 +255,7 @@ ALTER TABLE `User`
 --
 -- Index pour la table `_categorytoressource`
 --
-ALTER TABLE `_CategoryToTessource`
+ALTER TABLE `_CategoryToRessource`
   ADD UNIQUE KEY `_CategoryToRessource_AB_unique` (`A`,`B`),
   ADD KEY `_CategoryToRessource_B_index` (`B`);
 
@@ -307,27 +307,27 @@ ALTER TABLE `User`
 -- Contraintes pour la table `content`
 --
 ALTER TABLE `Content`
-  ADD CONSTRAINT `Content_ressourceId_fkey` FOREIGN KEY (`ressourceId`) REFERENCES `ressource` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `Content_ressourceId_fkey` FOREIGN KEY (`ressourceId`) REFERENCES `Ressource` (`id`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `profile`
 --
 ALTER TABLE `Profile`
-  ADD CONSTRAINT `Profile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `Profile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User` (`id`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `rating`
 --
 ALTER TABLE `Rating`
-  ADD CONSTRAINT `Rating_ressourceId_fkey` FOREIGN KEY (`ressourceId`) REFERENCES `ressource` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `Rating_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `Rating_ressourceId_fkey` FOREIGN KEY (`ressourceId`) REFERENCES `Ressource` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `Rating_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User` (`id`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `_categorytoressource`
 --
 ALTER TABLE `_CategoryToRessource`
-  ADD CONSTRAINT `_CategoryToRessource_A_fkey` FOREIGN KEY (`A`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `_CategoryToRessource_B_fkey` FOREIGN KEY (`B`) REFERENCES `ressource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `_CategoryToRessource_A_fkey` FOREIGN KEY (`A`) REFERENCES `Category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `_CategoryToRessource_B_fkey` FOREIGN KEY (`B`) REFERENCES `Ressource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

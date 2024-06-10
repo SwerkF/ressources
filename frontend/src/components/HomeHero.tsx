@@ -3,6 +3,7 @@ import { PlayCircle, Newspaper, Book, DiamondsFour, Code , Database } from '@pho
 import HomeFilterCard from './HomeFilterCard';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Alert from './Alert/Alert';
 
 const HomeHero = () => {
 
