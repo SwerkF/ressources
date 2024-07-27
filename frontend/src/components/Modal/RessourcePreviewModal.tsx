@@ -3,7 +3,7 @@ import CodeBlock from "../Blocks/CodeBlock";
 import ImageBlock from "../Blocks/ImageBlock";
 import Progress from "../Progress";
 
-const RessourcePreviewModal = ({ show, handleClose, ressource }: { show: boolean, handleClose: () => void, ressource: Ressource }) => {
+const RessourcePreviewModal = ({ show, handleClose, ressource, handleSave }: { show: boolean, handleClose: () => void, handleSave: () => void, ressource: Ressource }) => {
 
     return (
         <div className={`fixed z-10 inset-0 overflow-y-auto ${show ? 'block' : 'hidden'}`}>
@@ -71,6 +71,9 @@ const RessourcePreviewModal = ({ show, handleClose, ressource }: { show: boolean
                         </div>
                     </div>
                     <div className="bg-gray-50 dark:bg-neutral-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button onClick={handleSave} type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Save
+                        </button>
                         <button onClick={handleClose} type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                             Close
                         </button>

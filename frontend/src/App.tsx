@@ -46,6 +46,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="profile" element={<Profile />} />
               <Route path="/create-ressource" element={<CreateRessource />} />
+              {user && (user as any).role === 'ADMIN' && <Route path="/admin" element={<div>Admin</div>} />}
             </Routes>
             <Footer />
           </UserContext.Provider>

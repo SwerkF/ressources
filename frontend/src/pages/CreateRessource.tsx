@@ -55,8 +55,10 @@ const CreateRessource = () => {
         } else if (step === 2) {
             if (handleCheckContent()) {
                 setStep(step + 1);
+                setShowModal(true);
             }
         } else {
+            console.log(ressource)
             setShowModal(true);
         }
     }
@@ -77,7 +79,7 @@ const CreateRessource = () => {
                     ) : step === 2 ? (
                         <CreateRessourceStepTwo ressource={ressource} setRessource={setRessource} />
                     ) : step === 3 && (
-                        <p>f</p>
+                        <RessourcePreviewModal ressource={ressource} handleSave={() => { }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
                     )}
 
                 </div>
@@ -86,10 +88,6 @@ const CreateRessource = () => {
                      <Button text={step === 3 ? "Finish" : "Next"} icon={<CaretRight />} color="primary" onClick={handleCheckStep} />
                 </div>
             </div>
-           
-            {showModal && (
-                <RessourcePreviewModal ressource={ressource} show={showModal} handleClose={() => { setShowModal(false) }} />
-            )}
         </div>
     );
 };

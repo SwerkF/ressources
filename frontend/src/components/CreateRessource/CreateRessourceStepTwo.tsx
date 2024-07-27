@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../Button/Button';
 import { Image, TextT, TextHTwo, TextHOne, Trash, Code } from '@phosphor-icons/react';
 import ImageFormBlock from '../Blocks/Form/ImageFormBlock';
@@ -7,36 +7,48 @@ import HOneFormBlock from '../Blocks/Form/HOneFormBlock';
 import HTwoFormBlock from '../Blocks/Form/HTwoFormBlock';
 import CodeFormBlock from '../Blocks/Form/CodeFormBlock';
 
-const CreateRessourceStepTwo = ({ressource, setRessource} : any) => {
+const CreateRessourceStepTwo = ({ ressource, setRessource } : any) => {
 
-    const [blocks, setBlocks] = useState<any[]>([]);
+    const [blocks, setBlocks] = useState<any>([]);
     const [nextId, setNextId] = useState(1);
 
-    const handleCreateBlock = (type: string) => {
+    useEffect(() => {
+        if (ressource.content) {
+            setBlocks(ressource.content);
+            console.log('Initial blocks set from ressource content:', ressource.content);
+        }
+    }, [ressource.content]);
+
+    const handleCreateBlock = (type:string) => {
         const newBlock = {
-            id: nextId,
+            id: nextId.toString(),
             type: type,
             value: ""
         };
+        console.log('Creating new block:', newBlock);
         setBlocks([...blocks, newBlock]);
         setNextId(nextId + 1);
         setRessource({ ...ressource, content: [...ressource.content, newBlock] });
     };
 
-    const handleValueChange = (id: number, value: string) => {
-        const updatedBlocks = blocks.map(block => 
-            block.id === id ? { ...block, value: value } : block
-        );
+    const handleValueChange = (id:string, value:any) => {
+        console.log('Changing value of block with id:', id, 'to:', value);
+        const updatedBlocks = blocks.map((block:any) => {
+            console.log(`Checking block with id: ${block.id}`);
+            return block.id === id ? { ...block, value: value } : block;
+        });
+        console.log('Updated blocks after value change:', updatedBlocks);
         setBlocks(updatedBlocks);
         setRessource({ ...ressource, content: updatedBlocks });
     };
 
-    const handleDeleteBlock = (id: number) => {
-        const updatedBlocks = blocks.filter(block => block.id !== id);
+    const handleDeleteBlock = (id:string) => {
+        console.log('Deleting block with id:', id);
+        const updatedBlocks = blocks.filter((block:any) => block.id !== id);
+        console.log('Updated blocks after deletion:', updatedBlocks);
         setBlocks(updatedBlocks);
         setRessource({ ...ressource, content: updatedBlocks });
     };
-
 
     return (
         <div className="w-full flex flex-row gap-3">
@@ -49,18 +61,36 @@ const CreateRessourceStepTwo = ({ressource, setRessource} : any) => {
                 <Button text="Add Code" icon={<Code />} color="gray" onClick={() => { handleCreateBlock('code') }} />
             </div>
             <div className={`${blocks.length > 0 ? "w-[70%]" : "w-[60%]"} flex flex-col gap-3`}>
-            {blocks.length > 0 ? blocks.map((block, index) => {
-                return (
-                    <div key={index} className="flex flex-row items-start gap-3 mb-5">
-                        {block.type === 'image' && <ImageFormBlock image={block.value} setImage={(value: string) => { handleValueChange(block.id, value) }} />}
-                        {block.type === 'text' && <TextFormBlock text={block.value} setText={(value: string) => { handleValueChange(block.id, value) }} />}
-                        {block.type === 'title' && <HOneFormBlock title={block.value} setTitle={(value: string) => { handleValueChange(block.id, value) }} />}
-                        {block.type === 'subtitle' && <HTwoFormBlock title={block.value} setTitle={(value: string) => { handleValueChange(block.id, value) }} />}
-                        {block.type === 'code' && <CodeFormBlock code={block.value} setCode={(value: string) => { handleValueChange(block.id, value) }} />}
+                {blocks.length > 0 ? blocks.map((block:any) => (
+                    <div key={block.id} className="flex flex-row items-start gap-3 mb-5">
+                        {block.type === 'image' &&
+                            <ImageFormBlock
+                                image={block.value}
+                                setImage={(value:any) => { handleValueChange(block.id, value) }}
+                            />}
+                        {block.type === 'text' &&
+                            <TextFormBlock
+                                text={block.value}
+                                setText={(value) => handleValueChange(block.id, value)}
+                            />}
+                        {block.type === 'title' &&
+                            <HOneFormBlock
+                                title={block.value}
+                                setTitle={(value) => handleValueChange(block.id, value)}
+                            />}
+                        {block.type === 'subtitle' &&
+                            <HTwoFormBlock
+                                title={block.value}
+                                setTitle={(value) => handleValueChange(block.id, value)}
+                            />}
+                        {block.type === 'code' &&
+                            <CodeFormBlock
+                                code={block.value}
+                                setCode={(value) => handleValueChange(block.id, value)}
+                            />}
                         <Button icon={<Trash />} color="neutral" onClick={() => { handleDeleteBlock(block.id) }} />
                     </div>
-                )
-            }) : <p className='text-center'>No blocks added</p>}    
+                )) : <p className='text-center'>No blocks added</p>}
             </div>
         </div>
     )

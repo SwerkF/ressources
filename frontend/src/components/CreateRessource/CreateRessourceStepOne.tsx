@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import Button from '../Button/Button';
 import Input from '../Input';
 import { Category } from '../../types/Category';
+import Slider from '../Slider';
 
 const CreateRessourceStepOne = ({ressource, setRessource} : any) => {
     
@@ -76,13 +77,14 @@ const CreateRessourceStepOne = ({ressource, setRessource} : any) => {
                     />
                 ))}
             </div>
-            <Input 
-                label="Progress" 
-                type="number" 
-                placeholder="Progress" 
+            <Slider
+                label="Progress"
+                min={0}
+                max={100}
                 value={ressource.progress.toString()} 
-                onChange={(e) => { setRessource({ ...ressource, progress: parseInt(e.target.value) }) }}
+                onChange={(e:any) => { setRessource({ ...ressource, progress: parseInt(e.target.value) }) }}
             />
+                
         </Fragment>
     )
 }

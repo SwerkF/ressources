@@ -65,7 +65,10 @@ const Navbar = () => {
                                 <Link to="/profile">
                                     <span className="text-sm font-semibold dark:text-white">{(user as any).name}</span>
                                 </Link>
-                                <button className="text-sm font-semibold dark:text-white" onClick={handleLogout}>Disconnect</button>
+                                <div className='flex flex-row gap-1'>
+                                    {(user as any).role === 'ADMIN' && <Link className="text-sm font-semibold dark:text-white" to="/admin">Admin</Link>}
+                                    <button className="text-sm font-semibold dark:text-white" onClick={handleLogout}>Disconnect</button>
+                                </div>
                             </div>
                         </div>
                     )}
