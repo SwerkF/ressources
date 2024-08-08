@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from "../prisma/client";
+import prisma from '../lib/prisma-client';
 import { count } from 'console';
 
 export const getRessources = async (req: Request, res: Response) => {

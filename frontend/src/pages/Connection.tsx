@@ -22,8 +22,9 @@ const Login = () => {
         })
         .then(response => response.json())
         .then(data => {
-            localStorage.setItem('token', data.token);
-            window.location.href = '/';
+            console.log(data);
+            //localStorage.setItem('token', data.token);
+            //window.location.href = '/';
         })
     }
 
