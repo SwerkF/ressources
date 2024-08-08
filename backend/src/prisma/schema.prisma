@@ -34,6 +34,16 @@ model User {
   updatedAt DateTime @updatedAt
   profile   Profile?
   ratings   Rating[]
+  sessions  Session[]
+}
+
+// Sessions
+// Lucia sessions 
+model Session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 // Category
