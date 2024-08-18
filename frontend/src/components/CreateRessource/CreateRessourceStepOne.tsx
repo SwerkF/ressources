@@ -1,40 +1,69 @@
 import { Fragment, useEffect, useState } from 'react';
+import { z } from 'zod';
 import Button from '../Button/Button';
 import Input from '../Input';
+import InputFile from '../InputFile';  // Importer le nouveau composant InputFile
 import { Category } from '../../types/Category';
-import Slider from '../Slider';
 
-const CreateRessourceStepOne = ({ressource, setRessource} : any) => {
-    
+// Définir le schéma de validation
+const ressourceSchema = z.object({
+    title: z.string().min(1, { message: "Title is required" }),
+    description: z.string().min(1, { message: "Description is required" }),
+    url: z.string().url({ message: "Invalid URL" }),
+    file: z.instanceof(File).optional(),  // Validation pour le fichier
+    categories: z.array(z.any()).optional(),
+});
+
+const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
     const [categories, setCategories] = useState<any[]>([]);
+    const [errors, setErrors] = useState<any>({});
+    const [fileError, setFileError] = useState<any>();
 
     useEffect(() => {
         fetch("http://localhost:3000/api/categories")
             .then((response) => response.json())
             .then((data) => setCategories(data));
-        
-    }, [])
+    }, []);
+
+    const validate = (data: any) => {
+        try {
+            ressourceSchema.parse(data);
+            setErrors({});
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                const formattedErrors = error.errors.reduce((acc:any, err) => {
+                    acc[err.path[0]] = err.message;
+                    return acc;
+                }, {});
+                setErrors(formattedErrors);
+            }
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const newRessource = { ...ressource, [name]: value };
+        setRessource(newRessource);
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate the file
+            if (file.size > 5000000) {  // Example: max 5MB
+                setFileError('File size exceeds 5MB');
+            } else if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                setFileError('Only JPEG and PNG files are allowed');
+            } else {
+                setFileError(null);
+                setRessource({ ...ressource, file });
+            }
+        }
+    };
 
     const handleAddCategory = (category: Category) => {
-        if (ressource.categories.includes(category)) {
-            const updatedCategories = ressource.categories.filter((cat: { id: number; }) => cat.id !== category.id);
-            setRessource({ ...ressource, categories: updatedCategories });
-        } else {
-            setRessource({ ...ressource, categories: [...ressource.categories, category] });
-        }
-    }
-
-    const handleFileUpload = (e: any) => {
-        // check if the file is an image, if not delete it
-        console.log(e.target.files[0]);
-        if(e.target.files[0].type.split('/')[0] !== 'image'){
-            e.target.value = null;
-            return;
-        }
-        const file = e.target.files[0];
-        setRessource({ ...ressource, image: file });
-       
-    }
+        // Handle category addition
+    };
 
     return (
         <Fragment>
@@ -42,51 +71,47 @@ const CreateRessourceStepOne = ({ressource, setRessource} : any) => {
                 label="Title" 
                 type="text" 
                 placeholder="Title" 
+                name="title"
                 value={ressource.title} 
-                onChange={(e) => { setRessource({ ...ressource, title: e.target.value }) }}
+                onChange={handleChange}
+                error={errors.title}
             />
             <Input 
                 label="Description" 
                 type="text" 
                 placeholder="Description" 
+                name="description"
                 value={ressource.description} 
-                onChange={(e) => { setRessource({ ...ressource, description: e.target.value }) }}
+                onChange={handleChange}
+                error={errors.description}
             />
             <Input 
-                label="Url" 
+                label="Main Url" 
                 type="text" 
                 placeholder="URL" 
+                name="url"
                 value={ressource.url} 
-                onChange={(e) => { setRessource({ ...ressource, url: e.target.value }) }}
+                onChange={handleChange}
+                error={errors.url}
             />
-            <label htmlFor="file-input">Choose file</label>
-            <input type="file" name="file-input" id="file-input" className="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400
-                file:bg-gray-50 file:border-0
-                file:me-4
-                file:py-3 file:px-4
-                dark:file:bg-neutral-700 dark:file:text-neutral-400"
-                onChange={handleFileUpload} />
+            <InputFile 
+                label="Choose file" 
+                onChange={handleFileUpload}
+                error={fileError}
+            />
             <label className="text-gray-700 dark:text-neutral-300" htmlFor="categories">Categories</label>
             <div className="flex flex-row gap-3">
                 {categories.map((category, index) => (
                     <Button 
                         key={index} 
                         text={category.name} 
-                        color={ressource.categories.includes(category) ? "primary" : "gray"} 
+                        color={ressource.categories?.includes(category) ? "primary" : "gray"} 
                         onClick={() => { handleAddCategory(category) }} 
                     />
                 ))}
             </div>
-            <Slider
-                label="Progress"
-                min={0}
-                max={100}
-                value={ressource.progress.toString()} 
-                onChange={(e:any) => { setRessource({ ...ressource, progress: parseInt(e.target.value) }) }}
-            />
-                
         </Fragment>
-    )
-}
+    );
+};
 
 export default CreateRessourceStepOne;

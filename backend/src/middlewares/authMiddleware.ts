@@ -1,28 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { Lucia, TimeSpan } from 'lucia';
+import adapter from '../lib/lucia';
 
-const secret = process.env.JWT_SECRET || 'your-secret-key';
+const lucia = new Lucia(adapter, {
+    sessionExpiresIn: new TimeSpan(2, "w")
+});
 
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header('Authorization');
-    if (!token) {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    const sessionId = req.headers['authorization'];
+    console.log('sessionId', sessionId);
+    console.log('body', req.body);
+    if (!sessionId) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    
 
-    jwt.verify(token.split(' ')[1], secret, (err, user) => {
-        if (err) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-        req.user = user;
-        next();
-    });
-};
-
-declare global {
-    namespace Express {
-        interface Request {
-            user?: any;
-        }
+    const { session, user } = await lucia.validateSession(sessionId.toString());
+    if (!session || !user) {
+        console.log('Unauthorized');
+        return res.status(401).json({ error: 'Unauthorized' });
     }
-}
+
+    req.user = user;
+    req.session = session;
+
+    next();
+}; 

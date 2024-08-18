@@ -3,3 +3,5 @@ node_modules
 .env
 mysql
 mysq_data
+src/prisma/migrations
+src/images

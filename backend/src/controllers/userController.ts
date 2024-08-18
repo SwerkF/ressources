@@ -4,7 +4,11 @@ import adapter from '../lib/lucia';
 import { Lucia, TimeSpan } from "lucia";
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
+import sharp from 'sharp';
+import crypto from 'crypto';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+import fs from 'fs';
+import path from 'path';
 
 const lucia = new Lucia(adapter, {
     sessionExpiresIn: new TimeSpan(2, "w")
@@ -154,12 +158,12 @@ export const updateProfile = async (req: Request, res: Response) => {
     // get user with profile
     const userProfile = await prisma.user.findUnique({
         select : {
-        email: true,
-        name: true,
-        id: true,
-        isGoogle: true,
-        role: true,
-        profile: true
+            email: true,
+            name: true,
+            id: true,
+            isGoogle: true,
+            role: true,
+            profile: true
         },
         where: { id: user.id }
     });
@@ -167,27 +171,48 @@ export const updateProfile = async (req: Request, res: Response) => {
     if(!userProfile) return res.status(404).json({ error: 'User not found' });
 
     // delete old image.
-    if (image && userProfile.profile && userProfile.profile.image) {
-        // check if image is not google image,
-        const googleImage = userProfile.profile.image.includes('googleusercontent');
-        if (!googleImage) {
-        const fs = require('fs');
-        const path = require('path');
-        const oldPath = path.join(__dirname, '..', '..', 'src/images', userProfile.profile.image.split('/').pop());
-        fs.unlinkSync(oldPath);
-        }
+    if (userProfile.profile && userProfile.profile.image && image) {
+        const oldImagePath = userProfile.profile.image.replace('http://localhost:3000/api/images/', '');
+        const filePath = path.join(process.cwd(), 'src/images', oldImagePath);
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+        });
     }
 
-    // rename image uploaded to the new name to user.id + extension
     if (image) {
-        const fs = require('fs');
-        const path = require('path');
-        const ext = image.mimetype.split('/')[1];
-        const oldPath = path.join(__dirname, '..', '..', 'src/images', image.filename);
-        const newPath = path.join(__dirname, '..', '..', 'src/images', `${user.id}.${ext}`);
-        fs.renameSync(oldPath, newPath);
-        image.filename = `${user.id}.${ext}`;
+        const oldImagePath = image.path; // Chemin de l'image temporaire
+    
+        // Générer un hash unique
+        const hash = crypto.randomBytes(16).toString('hex');
+        const newImageName = `${userProfile.name}_${hash}${path.extname(image.originalname)}`; // Nouveau nom d'image avec hash
+        const newImagePath = path.join(process.cwd(), 'src/images', newImageName); // Chemin complet du nouveau nom d'image
+    
+        // Renommer l'image temporaire
+        fs.renameSync(oldImagePath, newImagePath);
+    
+        // Redimensionner l'image
+        const resizedImagePath = newImagePath.replace(
+            path.extname(newImageName),
+            '_200x200' + path.extname(newImageName)
+        );
+    
+        await sharp(newImagePath)
+            .resize(200, 200)
+            .toFile(resizedImagePath);
+    
+        // Supprimer l'image originale après le redimensionnement
+        fs.unlinkSync(newImagePath);
+    
+        // Ajouter le chemin de l'image redimensionnée à l'objet userProfile
+        userProfile.profile!.image = `http://localhost:3000/api/images/${path.basename(resizedImagePath)}`;
     }
+
+
+
+    
 
     // update user, imageLink is http://localhost:3000/api/images/ + image.filename
     const updatedUser = await prisma.user.update({
@@ -198,7 +223,7 @@ export const updateProfile = async (req: Request, res: Response) => {
         profile: {
             update: {
             bio,
-            image: image ? `http://localhost:3000/api/images/${image.filename}` : userProfile.profile && userProfile.profile.image ? userProfile.profile.image : null
+            image: userProfile.profile?.image
             }
         }
         }

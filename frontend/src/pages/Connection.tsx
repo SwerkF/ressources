@@ -1,49 +1,40 @@
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import UserService from '../services/UserService';
+import { Cookies } from 'react-cookie';
+
+const userService = new UserService();
+
 const Login = () => {
 
     useEffect(() => {
-        if (localStorage.getItem('token')) {
-            navigate('/');
-        }
+        userService.getCookies().then((res:any) => {
+            console.log(res);
+            if (res) {
+                navigate('/');
+            }
+        });
     }, []);
 
     const navigate = useNavigate();
     
-    const handleSuccess = (response: any) => {
+    const handleGoogleLogin = (response: any) => {
         console.log(response);
-        fetch('http://localhost:3000/api/users/google', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ tokenId: response.credential})
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            //localStorage.setItem('token', data.token);
-            //window.location.href = '/';
-        })
+        userService.googleLogin(response).then((res:any) => {
+            const cookies = new Cookies();
+            cookies.set('sessionId', res.session.id, { path: '/' });
+            navigate('/');
+        });
     }
 
-    const handleOnSubmit = (e: any) => {
+    const handleClassicLogin = (e: any) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        fetch('http://localhost:3000/api/users/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            localStorage.setItem('token', data.token);
+        userService.login(e).then((res:any) => {
+            const cookies = new Cookies();
+            cookies.set('sessionId', res.data.session.id, { path: '/' });
             navigate('/');
-        })
+        });
     }
 
     return (
@@ -64,11 +55,11 @@ const Login = () => {
                     <div className="mt-5">
                         <div className='flex justify-center'>
                             <GoogleLogin
-                                onSuccess={handleSuccess}
+                                onSuccess={handleGoogleLogin}
                             />
                         </div>
                         <div className="py-3 flex items-center text-xs text-gray-400 uppercase before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-neutral-500 dark:before:border-neutral-600 dark:after:border-neutral-600">Or</div>
-                        <form onSubmit={handleOnSubmit}>
+                        <form onSubmit={handleClassicLogin}>
                             <div className="grid gap-y-4">
                                 <div>
                                     <label htmlFor="email" className="block text-sm mb-2 dark:text-white">Email address</label>

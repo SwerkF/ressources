@@ -10,28 +10,21 @@ import Login from './pages/Connection';
 import Profile from './pages/Profile';
 
 import CreateRessource from './pages/CreateRessource';
+import UserService from './services/UserService';
 
 const UserContext = createContext(null);
+
+const userService = new UserService();
 
 function App() {
 
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    console.log(token);
-    if (token) {
-      fetch('http://localhost:3000/api/users/me', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }})
-        .then(response => response.json())
-        .then((data) => {
-          if(data.error) { return localStorage.removeItem('token'); }
-          setUser(data);
-        })
-    }
-  }, [])
+    userService.getProfile().then((res: any) => {
+      setUser(res);
+    });
+  }, []);
     
 
   return (

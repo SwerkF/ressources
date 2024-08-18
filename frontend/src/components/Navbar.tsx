@@ -50,7 +50,7 @@ const Navbar = () => {
                         <div className="flex flex-row items-center gap-3">
                             <Link to="/profile">
                             {(user as any) && (user as any).profile.image ? 
-                                <img src={(user as any).profile.image} alt="avatar" className="w-8 h-8 rounded-full" /> 
+                                <img src={(user as any).profile.image} alt="avatar" className="w-8 h-8 object-cover rounded-full" /> 
                                 : 
                                 <span className="inline-block size-[38px] bg-gray-100 rounded-full overflow-hidden">
                                     <svg className="size-full text-gray-300" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
