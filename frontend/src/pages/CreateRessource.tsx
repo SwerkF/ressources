@@ -17,7 +17,7 @@ const CreateRessource = () => {
         updatedAt: "",
         title: "",
         description: "",
-        image: "",
+        file: undefined,
         progress: 0,
         content: []
     });
@@ -27,7 +27,8 @@ const CreateRessource = () => {
     const [alert, setAlert] = useState({ message: "", type: "" });
    
     const handleCheckForm = () => {
-        if (ressource.title === "" || ressource.description === "" || ressource.url === "" || ressource.image === "" || ressource.categories.length === 0 || ressource.progress === 0) {
+        console.log(ressource)
+        if (ressource.title === "" || ressource.description === "" || ressource.url === "" || ressource.file === undefined || ressource.categories.length === 0) {
             setAlert({ message: "Please fill all fields", type: "danger" });
             return false;
         }
@@ -79,7 +80,7 @@ const CreateRessource = () => {
                     ) : step === 2 ? (
                         <CreateRessourceStepTwo ressource={ressource} setRessource={setRessource} />
                     ) : step === 3 && (
-                        <RessourcePreviewModal ressource={ressource} handleSave={() => { }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
+                        <RessourcePreviewModal ressource={ressource} handleSave={() => { console.log(ressource) }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
                     )}
 
                 </div>

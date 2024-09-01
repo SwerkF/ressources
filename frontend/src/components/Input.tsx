@@ -14,6 +14,7 @@ export interface InputProps {
 
 
 const Input = ({ label, type, placeholder, value, name, onChange, required, disabled, error, className }: InputProps) => {
+
     return (
         <div className="flex flex-col items-start">
             {label && <label htmlFor={label}>{label}</label>}

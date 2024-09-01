@@ -63,6 +63,13 @@ const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
 
     const handleAddCategory = (category: Category) => {
         // Handle category addition
+        const newCategories = ressource.categories ? [...ressource.categories] : [];
+        if (newCategories.includes(category)) {
+            newCategories.splice(newCategories.indexOf(category), 1);
+        } else {
+            newCategories.push(category);
+        }
+        setRessource({ ...ressource, categories: newCategories });
     };
 
     return (

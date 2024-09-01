@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import RessourceCard from '../components/Cards/RessourceCard';
 import RessourceModal from '../components/Modal/RessourceModal';
 import Button from '../components/Button/Button';
@@ -18,6 +19,7 @@ const Ressources = () => {
     const [categories, setCategories] = useState([]);
     const [firstLoad, setFirstLoad] = useState(true);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchRessources = async (urlSearch?: string,urlCategory?: string) => {
         
@@ -79,7 +81,6 @@ const Ressources = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
             <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-white mt-6">Ressources</h2>
             <p className="text-center text-gray-600 dark:text-neutral-400">Découvrez les ressources proposées par le site.</p>
-            
             <form onSubmit={(e) => {e.preventDefault();fetchRessources();}}>
                 <div className="flex justify-center mt-5 gap-2">
                     <div className="relative z-10 flex space-x-3 p-3 bg-white border rounded-lg shadow-lg shadow-gray-100 dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-gray-900/20 w-1/2">

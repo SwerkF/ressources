@@ -16,7 +16,7 @@ const Loader = () => {
                     speed="1.2" 
                     color="coral"
                 ></l-reuleaux>
-                <p className='mt-4 text-lg font-semibold text-gray-700 dark:text-gray-200'>Loading...</p>
+                <p className='mt-4 text-lg font-semibold text-gray-700 dark:text-gray-200'>Chargement...</p>
             </div>
         </Fragment>
     )
