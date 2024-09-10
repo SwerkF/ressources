@@ -4,6 +4,7 @@ import ThemeSwitch from './ThemeSwitch';
 import Button from './Button/Button';
 import NavbarLink from './NavbarLink';
 import { UserContext } from '../App';
+import { Cookies } from 'react-cookie';
 
 const Navbar = () => {
 
@@ -18,7 +19,8 @@ const Navbar = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
+        const cookies = new Cookies();
+        cookies.remove('sessionId');
         window.location.href = '/';
     }
 

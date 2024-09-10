@@ -5,11 +5,10 @@ export interface Ressource {
     id?: number;
     title: string;
     description: string;
-    image: string;
+    file: string;
     url: string;
     categories: Category[];
     content: Content[];
-    progress: number;
     //ratings: Rating[];
     createdAt: string;
     updatedAt: string;

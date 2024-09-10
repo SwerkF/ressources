@@ -2,7 +2,7 @@
 import { ButtonColorClass, ButtonWidthClass, ButtonSizeClass } from './ButtonStyle';
 
 const Button = (props:any) => {
-    // props: color, size, width, text, icon, onClick, active
+    // props: children, size, width, text, icon, onClick, active, class
 
     const colorClass = ButtonColorClass(props.color, props.active ? true : false);
     const sizeClass = ButtonSizeClass(props.size);
@@ -12,7 +12,7 @@ const Button = (props:any) => {
     return (
         <button type="button" className={`flex justify-center items-center gap-x-2 ${sizeClass} ${widthClass} ${colorClass} rounded-lg border border-transparent shadow-sm hover:shadow disabled:opacity-50 disabled:pointer-events-none`} onClick={props.onClick} >
             {props.icon}
-            {props.text}
+            {props.children}
         </button>
     );
 }

@@ -24,7 +24,7 @@ const Login = () => {
         userService.googleLogin(response).then((res:any) => {
             const cookies = new Cookies();
             cookies.set('sessionId', res.session.id, { path: '/' });
-            navigate('/');
+            window.location.href = '/';
         });
     }
 
@@ -33,7 +33,7 @@ const Login = () => {
         userService.login(e).then((res:any) => {
             const cookies = new Cookies();
             cookies.set('sessionId', res.data.session.id, { path: '/' });
-            navigate('/');
+            window.location.href = '/';
         });
     }
 

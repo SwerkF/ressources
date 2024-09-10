@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 
 import CreateRessource from './pages/CreateRessource';
 import UserService from './services/UserService';
+import Register from './pages/Register';
 
 const UserContext = createContext(null);
 
@@ -37,6 +38,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/ressources" element={<Ressources />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route path="profile" element={<Profile />} />
               <Route path="/create-ressource" element={<CreateRessource />} />
               {user && (user as any).role === 'ADMIN' && <Route path="/admin" element={<div>Admin</div>} />}

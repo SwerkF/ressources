@@ -5,16 +5,7 @@ import Input from '../Input';
 import InputFile from '../InputFile';  // Importer le nouveau composant InputFile
 import { Category } from '../../types/Category';
 
-// Définir le schéma de validation
-const ressourceSchema = z.object({
-    title: z.string().min(1, { message: "Title is required" }),
-    description: z.string().min(1, { message: "Description is required" }),
-    url: z.string().url({ message: "Invalid URL" }),
-    file: z.instanceof(File).optional(),  // Validation pour le fichier
-    categories: z.array(z.any()).optional(),
-});
-
-const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
+const CreateRessourceStepOne = ({ ressourceForm } : any) => {
     const [categories, setCategories] = useState<any[]>([]);
     const [errors, setErrors] = useState<any>({});
     const [fileError, setFileError] = useState<any>();
@@ -25,25 +16,11 @@ const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
             .then((data) => setCategories(data));
     }, []);
 
-    const validate = (data: any) => {
-        try {
-            ressourceSchema.parse(data);
-            setErrors({});
-        } catch (error) {
-            if (error instanceof z.ZodError) {
-                const formattedErrors = error.errors.reduce((acc:any, err) => {
-                    acc[err.path[0]] = err.message;
-                    return acc;
-                }, {});
-                setErrors(formattedErrors);
-            }
-        }
-    };
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const newRessource = { ...ressource, [name]: value };
-        setRessource(newRessource);
+        setErrors({ ...errors, [name]: "" });
+        console.log(ressourceForm[name]);
+        ressourceForm[name] = value;
     };
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,23 +33,28 @@ const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
                 setFileError('Only JPEG and PNG files are allowed');
             } else {
                 setFileError(null);
-                setRessource({ ...ressource, file });
+               
             }
         }
     };
 
     const handleAddCategory = (category: Category) => {
-        // Handle category addition
+        if (ressourceForm.categories.includes(category)) {
+            ressourceForm.categories = ressourceForm.categories.filter((cat: Category) => cat.id !== category.id);
+        } else {
+            ressourceForm.categories.push(category);
+        }
     };
 
     return (
+       ressourceForm && (
         <Fragment>
             <Input 
                 label="Title" 
                 type="text" 
                 placeholder="Title" 
                 name="title"
-                value={ressource.title} 
+                value={ressourceForm.title} 
                 onChange={handleChange}
                 error={errors.title}
             />
@@ -81,7 +63,7 @@ const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
                 type="text" 
                 placeholder="Description" 
                 name="description"
-                value={ressource.description} 
+                value={ressourceForm.description} 
                 onChange={handleChange}
                 error={errors.description}
             />
@@ -90,7 +72,7 @@ const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
                 type="text" 
                 placeholder="URL" 
                 name="url"
-                value={ressource.url} 
+                value={ressourceForm.url} 
                 onChange={handleChange}
                 error={errors.url}
             />
@@ -105,12 +87,13 @@ const CreateRessourceStepOne = ({ ressource, setRessource } : any) => {
                     <Button 
                         key={index} 
                         text={category.name} 
-                        color={ressource.categories?.includes(category) ? "primary" : "gray"} 
+                        color={ressourceForm.categories?.includes(category) ? "primary" : "gray"} 
                         onClick={() => { handleAddCategory(category) }} 
                     />
                 ))}
             </div>
         </Fragment>
+       )
     );
 };
 

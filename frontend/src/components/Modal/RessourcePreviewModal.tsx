@@ -3,7 +3,7 @@ import CodeBlock from "../Blocks/CodeBlock";
 import ImageBlock from "../Blocks/ImageBlock";
 import Progress from "../Progress";
 
-const RessourcePreviewModal = ({ show, handleClose, ressource, handleSave }: { show: boolean, handleClose: () => void, handleSave: () => void, ressource: Ressource }) => {
+const RessourcePreviewModal = ({ show, handleClose, ressourceForm, handleSave }: { show: boolean, handleClose: () => void, handleSave: () => void, ressourceForm: any }) => {
 
     return (
         <div className={`fixed z-10 inset-0 overflow-y-auto ${show ? 'block' : 'hidden'}`}>
@@ -17,20 +17,17 @@ const RessourcePreviewModal = ({ show, handleClose, ressource, handleSave }: { s
                         <div className="sm:flex justify-center sm:items-start">
                             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                                 <div className="img-fluid">
-                                    <img src={ressource.image} alt={ressource.title} className="w-full h-60 object-cover rounded-lg" />
-                                </div>
-                                <div className="progress mt-3">
-                                    <Progress progress={ressource.progress} />
+                                    <img src={ressourceForm.file} alt={ressourceForm.title} className="w-full h-60 object-cover rounded-lg" />
                                 </div>
                                 <h3 className="text-3xl mt-5 leading-6 font-medium text-gray-900 dark:text-white" id="modal-headline mt-4">
-                                    {ressource.title}
+                                    {ressourceForm.title}
                                 </h3>
                                 <p className="text-sm mt-3 text-gray-500 dark:text-neutral-400">
-                                    {ressource.description}
+                                    {ressourceForm.description}
                                 </p>
-                                {ressource.content && (
+                                {ressourceForm.content && (
                                     <div className="mt-4">
-                                        {ressource.content.map((content, index) => (
+                                        {ressourceForm.content.map((content:any, index:any) => (
                                             content.type === 'text' ? (
                                                 <p key={index} className="text-gray-600 dark:text-neutral-400">
                                                     {content.value}

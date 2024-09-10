@@ -2,43 +2,46 @@ import { useState } from "react";
 import Button from "../components/Button/Button";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import RessourcePreviewModal from "../components/Modal/RessourcePreviewModal";
-import { Ressource } from "../types/Ressource";
 import Alert from "../components/Alert/Alert";
 import CreateRessourceStepOne from "../components/CreateRessource/CreateRessourceStepOne";
 import CreateRessourceStepTwo from "../components/CreateRessource/CreateRessourceStepTwo";
 import Steps from "../components/Steps";
+import { z } from "zod";
+
+const ressourceSchema = z.object({
+    title: z.string().min(1, { message: "Title is required" }),
+    description: z.string().min(1, { message: "Description is required" }),
+    url: z.string().url({ message: "Invalid URL" }),
+    file: z.instanceof(File).optional(),
+    categories: z.array(z.any()).min(1, { message: "Please select at least one category" }).default([]),
+    content: z.array(z.any()).optional(),
+});
 
 const CreateRessource = () => {
-
-    const [ressource, setRessource] = useState<Ressource>({
-        url: "",
-        categories: [],
-        createdAt: "",
-        updatedAt: "",
-        title: "",
-        description: "",
-        image: "",
-        progress: 0,
-        content: []
-    });
-
     const [showModal, setShowModal] = useState(false);
     const [step, setStep] = useState(1);
     const [alert, setAlert] = useState({ message: "", type: "" });
-   
+    const [ressourceForm, setRessourceForm] = useState({
+        title: "",
+        description: "",
+        url: "",
+        file: null,
+        categories: [],
+        content: []
+    });
+
     const handleCheckForm = () => {
-        if (ressource.title === "" || ressource.description === "" || ressource.url === "" || ressource.image === "" || ressource.categories.length === 0 || ressource.progress === 0) {
-            setAlert({ message: "Please fill all fields", type: "danger" });
+        try {
+            ressourceSchema.parse(ressourceForm);
+            return true;
+        } catch (error: any) {
+            setAlert({ message: error.errors[0].message, type: "danger" });
             return false;
         }
-        return true;
     }
 
     const handleCheckContent = () => {
-        if (ressource.content.length === 0) {
-            setAlert({ message: "Please add content to your ressource", type: "danger" });
-            return false;
-        }
+        // Implement content-specific validation if needed
         return true;
     }
 
@@ -58,16 +61,19 @@ const CreateRessource = () => {
                 setShowModal(true);
             }
         } else {
-            console.log(ressource)
             setShowModal(true);
         }
     }
 
     return (
         <div className="container mx-auto dark:text-white">
-            <h1 className="text-3xl font-bold text-center mb-10">Create a ressource</h1>
+            <h1 className="text-3xl font-bold text-center mb-10">Create a resource</h1>
             <div className="flex flex-row gap-3 justify-center">
-                <Steps currentStep={step} steps={[{ id: 1, label: "Informations" }, { id: 2, label: "Content" }, { id: 3, label: "Preview" }]} onStepClick={(stepId: number) => { setStep(stepId) }} />
+                <Steps currentStep={step} steps={[
+                    { id: 1, label: "Informations" },
+                    { id: 2, label: "Content" },
+                    { id: 3, label: "Preview" }
+                ]} onStepClick={(stepId: number) => { setStep(stepId) }} />
             </div>
             <div className={`flex gap-10 flex-col items-center `}>
                 <div className={`flex flex-col gap-4 ${step == 1 ? "w-1/2" : "w-full"}`}>
@@ -75,11 +81,11 @@ const CreateRessource = () => {
                         {alert.message && <Alert message={alert.message} type={alert.type} />}
                     </div>
                     {step === 1 ? (
-                        <CreateRessourceStepOne ressource={ressource} setRessource={setRessource} />
+                        <CreateRessourceStepOne ressourceForm={ressourceSchema}/>
                     ) : step === 2 ? (
-                        <CreateRessourceStepTwo ressource={ressource} setRessource={setRessource} />
+                        <CreateRessourceStepTwo ressourceForm={ressourceSchema}/>
                     ) : step === 3 && (
-                        <RessourcePreviewModal ressource={ressource} handleSave={() => { }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
+                        <RessourcePreviewModal ressourceForm={ressourceSchema} handleSave={() => { }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
                     )}
 
                 </div>
