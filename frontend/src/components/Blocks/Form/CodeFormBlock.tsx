@@ -3,20 +3,26 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const CodeFormBlock = ({ code, setCode }: { code: string, setCode: (code: string) => void }) => {
-    const initialLanguage = code.split('+')[0] || "javascript";
-    const initialCode = code.split('+')[1] || "";
+    // Find the first occurrence of '+'
+    const plusIndex = code.indexOf('+');
+    
+    // If '+' is found, split the string at that point, otherwise use default values
+    const initialLanguage = plusIndex !== -1 ? code.slice(0, plusIndex) : "shell";
+    const initialCode = plusIndex !== -1 ? code.slice(plusIndex + 1) : "";
 
     const [language, setLanguage] = useState(initialLanguage);
     const [text, setText] = useState(initialCode);
 
     const handleCodeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setText(e.target.value);
-        setCode(`${language}+${e.target.value}`);
+        const updatedCode = e.target.value;
+        setText(updatedCode);
+        setCode(`${language}+${updatedCode}`);
     };
 
     const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setLanguage(e.target.value);
-        setCode(`${e.target.value}+${text}`);
+        const updatedLanguage = e.target.value;
+        setLanguage(updatedLanguage);
+        setCode(`${updatedLanguage}+${text}`);
     };
 
     return (

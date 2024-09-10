@@ -79,9 +79,6 @@ const Profile = () => {
         });
     }
     
-
-    
-
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen max-w-[40rem]">
             <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
@@ -90,7 +87,7 @@ const Profile = () => {
                         <img src={user && user.profile.image} alt="avatar" className="w-32 h-32 object-cover rounded-full mx-auto" />
                         <h1 className="block text-2xl mt-3 font-bold text-gray-800 dark:text-white">Profile</h1>
                         <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
-                            Welcome {user && user.name}
+                            Bienvenue, {user && user.name} !
                         </p>
                         {user && (
                             <form className="mt-5" onSubmit={handleSubmit}>
@@ -142,7 +139,7 @@ const Profile = () => {
                                     </div>
 
                                     <InputFile
-                                        label="Profile Image"
+                                        label="Image de profile"
                                         onChange={handleFileChange}
                                         error={errors.profile?.image?._errors[0]}
                                     />
@@ -152,7 +149,7 @@ const Profile = () => {
                                     </div>
                                     
                                     <div className="flex flex-col items-start">
-                                        <button type="submit" className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Update</button>
+                                        <button type="submit" className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Mettre à jour</button>
                                     </div>
                                 </div>
                             </form>

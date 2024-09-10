@@ -38,7 +38,7 @@ const LatestRessources = () => {
     return (
         <React.Fragment>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">Latest Ressources</h2>
+                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">Dernière ressources</h2>
                 <div className='flex flex-wrap justify-center gap-5 mt-6'>
                     {loading ? <Loader /> : ressources.map((ressource) => (
                        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
@@ -48,7 +48,7 @@ const LatestRessources = () => {
                 </div>
                 <div className="flex justify-center mt-6">
                     <Link to="/ressources" className="flex items-center gap-1 text-blue-600 hover:underline dark:text-blue-400">
-                        View all ressources
+                        Voir plus de ressources
                         <ArrowRight />
                     </Link>
                 </div>

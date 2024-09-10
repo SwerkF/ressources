@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Ressource } from "../../types/Ressource";
 import CodeBlock from "../Blocks/CodeBlock";
 import ImageBlock from "../Blocks/ImageBlock";
@@ -5,10 +6,24 @@ import Progress from "../Progress";
 
 const RessourcePreviewModal = ({ show, handleClose, ressourceForm, handleSave }: { show: boolean, handleClose: () => void, handleSave: () => void, ressourceForm: any }) => {
 
+    const [streamableImage, setStreamableImage] = useState<string | null>(null);
+
+    useEffect(() => {
+        const imageFile = ressource.image || ressource.file;
+
+        if (imageFile && imageFile.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setStreamableImage(reader.result as string);
+            };
+            reader.readAsDataURL(imageFile);
+        }
+    }, [ressource.image, ressource.file]);
+
     return (
         <div className={`fixed z-10 inset-0 overflow-y-auto ${show ? 'block' : 'hidden'}`}>
             <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={(handleClose)}>
+                <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={handleClose}>
                     <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -17,7 +32,11 @@ const RessourcePreviewModal = ({ show, handleClose, ressourceForm, handleSave }:
                         <div className="sm:flex justify-center sm:items-start">
                             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                                 <div className="img-fluid">
-                                    <img src={ressourceForm.file} alt={ressourceForm.title} className="w-full h-60 object-cover rounded-lg" />
+                                    {streamableImage ? (
+                                        <img src={streamableImage} alt={ressource.title} className="w-full h-60 object-cover rounded-lg" />
+                                    ) : (
+                                        <p>Loading image...</p>
+                                    )}
                                 </div>
                                 <h3 className="text-3xl mt-5 leading-6 font-medium text-gray-900 dark:text-white" id="modal-headline mt-4">
                                     {ressourceForm.title}
@@ -41,12 +60,20 @@ const RessourcePreviewModal = ({ show, handleClose, ressourceForm, handleSave }:
                                                     {content.value}
                                                 </h5>
                                             ) : content.type === 'code' ? (
-                                                <div key={index} className="mt-5">
-                                                    <CodeBlock language={content.value.split('+')[0]} code={content.value.split('+')[1]} />
-                                                </div>
+                                                (() => {
+                                                    const plusIndex = content.value.indexOf('+');
+                                                    const language = plusIndex !== -1 ? content.value.slice(0, plusIndex) : "shell";
+                                                    const code = plusIndex !== -1 ? content.value.slice(plusIndex + 1) : content.value;
+                                                    
+                                                    return (
+                                                        <div key={index} className="mt-5">
+                                                            <CodeBlock language={language} code={code} />
+                                                        </div>
+                                                    );
+                                                })()
                                             ) : content.type === 'image' ? (
-                                            <div key={index} className="mt-5">
-                                                    <ImageBlock src={content.value} />
+                                                <div key={index} className="mt-5">
+                                                    <ImageBlock file={content.value} />
                                                 </div>
                                             ) : content.type === 'link' ? (
                                                 <div key={index} className="mt-5">
@@ -78,10 +105,7 @@ const RessourcePreviewModal = ({ show, handleClose, ressourceForm, handleSave }:
                 </div>
             </div>
         </div>
-       
     );
-
-
 }
 
 export default RessourcePreviewModal;

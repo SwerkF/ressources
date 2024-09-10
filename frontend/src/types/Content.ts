@@ -3,7 +3,7 @@ import { Ressource } from './Ressource';
 export interface Content {
     id: number;
     type: string;
-    value: string;
+    value: any;
     ressource: Ressource;
     ressourceId: number;
     createdAt: string;

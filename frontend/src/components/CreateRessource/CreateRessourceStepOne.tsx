@@ -39,11 +39,14 @@ const CreateRessourceStepOne = ({ ressourceForm } : any) => {
     };
 
     const handleAddCategory = (category: Category) => {
-        if (ressourceForm.categories.includes(category)) {
-            ressourceForm.categories = ressourceForm.categories.filter((cat: Category) => cat.id !== category.id);
+        // Handle category addition
+        const newCategories = ressource.categories ? [...ressource.categories] : [];
+        if (newCategories.includes(category)) {
+            newCategories.splice(newCategories.indexOf(category), 1);
         } else {
-            ressourceForm.categories.push(category);
+            newCategories.push(category);
         }
+        setRessource({ ...ressource, categories: newCategories });
     };
 
     return (
