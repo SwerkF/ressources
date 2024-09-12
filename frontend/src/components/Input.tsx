@@ -6,6 +6,7 @@ export interface InputProps {
     placeholder: string;
     value: string;
     name?: string;
+    icon?: any;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
     disabled?: boolean;
@@ -13,13 +14,33 @@ export interface InputProps {
     className?: string;
 }
 
-const Input = ({ label, type, placeholder, value, name, onChange, required, disabled, error, className }: InputProps) => {
+const Input = ({ label, type, placeholder, value, name, icon, onChange, required, disabled, error, className }: InputProps) => {
 
     useEffect(() => {
         console.log(error);
     }, [error]);
 
     return (
+       icon ? (
+        <div className="flex flex-row gap-2 items-center w-full dark:text-white text-black">
+            {icon}
+            <div className="flex flex-col items-start w-full">
+                {label && <label className="dark:text-white mb-1" htmlFor={label}>{label}</label>}
+                <input
+                    type={type}
+                    id={label}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    required={required}
+                    disabled={disabled}
+                    className={`py-3 px-4 block w-full border ${error ? "border-red-200 dark:border-red-500" : "border-gray-200 dark:border-neutral-700"} rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 ${className}`}
+                />
+                {error && <p className="text-red-600">{typeof error === 'string' ? error : error.message}</p>}
+            </div>
+        </div>
+       ) : (
         <div className="flex flex-col items-start">
             {label && <label className="dark:text-white mb-1" htmlFor={label}>{label}</label>}
             <input
@@ -35,6 +56,7 @@ const Input = ({ label, type, placeholder, value, name, onChange, required, disa
             />
             {error && <p className="text-red-600">{typeof error === 'string' ? error : error.message}</p>}
         </div>
+       )
     );
 };
 

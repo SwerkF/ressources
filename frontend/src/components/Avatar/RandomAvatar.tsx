@@ -2,7 +2,7 @@ import Avatar from "boring-avatars";
 import { useEffect, useState } from "react";
 import { AvatarProps } from "boring-avatars";
 
-const RandomAvatar = ({refresh, currentColors, setCurrentColors} : {refresh: boolean, currentColors: string[], setCurrentColors: any} ) => {
+const RandomAvatar = ({refresh, setUserAvatar, currentColors, setCurrentColors} : {refresh: boolean, setUserAvatar: any, currentColors: string[], setCurrentColors: any} ) => {
 
     const [avatar, setAvatar] = useState<any>({
         name: "XXXXXXX",
@@ -24,6 +24,8 @@ const RandomAvatar = ({refresh, currentColors, setCurrentColors} : {refresh: boo
             variant: "beam",
             colors
         });
+        setUserAvatar(avatar);
+
     }, [refresh]);
 
     useEffect(() => {
@@ -32,6 +34,7 @@ const RandomAvatar = ({refresh, currentColors, setCurrentColors} : {refresh: boo
             variant: "beam",
             colors: currentColors
         });
+        setUserAvatar(avatar);
     }, [currentColors]);
 
     return (

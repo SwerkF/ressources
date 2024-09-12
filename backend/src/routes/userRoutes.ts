@@ -19,7 +19,7 @@ const router = express.Router();
 router.get('/', getUsers);
 router.get('/me', authMiddleware, getProfile);
 router.get('/:id', getUserById);
-router.post('/', createUser);
+router.post('/register', createUser);
 router.post('/login', loginUser);
 router.post('/google', googleLogin);
 router.put('/me', authMiddleware, upload.single('image'), updateProfile);

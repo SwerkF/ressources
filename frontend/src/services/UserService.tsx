@@ -1,4 +1,5 @@
 import { Cookies } from 'react-cookie';
+import { RegisterForm } from '../types/RegisterForm';
 
 class UserService {
     private readonly url: string;
@@ -48,6 +49,24 @@ class UserService {
         } catch (error) {
             console.error('Error during Google login:', error);
             throw error; // Rejeter la promesse en cas d'erreur
+        }
+    }
+
+    async register(userForm: RegisterForm) {
+        try {
+            const response = await fetch(`${this.url}/api/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userForm)
+            });
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error during register:', error);
+            throw error;
         }
     }
 
