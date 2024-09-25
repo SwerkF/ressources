@@ -5,7 +5,7 @@ import Input from '../Input';
 import InputFile from '../InputFile';  // Importer le nouveau composant InputFile
 import { Category } from '../../types/Category';
 
-const CreateRessourceStepOne = ({ ressourceForm } : any) => {
+const CreateRessourceStepOne = ({ ressourceForm, setRessourceForm } : any) => {
     const [categories, setCategories] = useState<any[]>([]);
     const [errors, setErrors] = useState<any>({});
     const [fileError, setFileError] = useState<any>();
@@ -40,13 +40,13 @@ const CreateRessourceStepOne = ({ ressourceForm } : any) => {
 
     const handleAddCategory = (category: Category) => {
         // Handle category addition
-        const newCategories = ressource.categories ? [...ressource.categories] : [];
+        const newCategories = ressourceForm.categories ? [...ressourceForm.categories] : [];
         if (newCategories.includes(category)) {
             newCategories.splice(newCategories.indexOf(category), 1);
         } else {
             newCategories.push(category);
         }
-        setRessource({ ...ressource, categories: newCategories });
+        setRessourceForm({ ...ressourceForm, categories: newCategories });
     };
 
     return (
@@ -89,10 +89,9 @@ const CreateRessourceStepOne = ({ ressourceForm } : any) => {
                 {categories.map((category, index) => (
                     <Button 
                         key={index} 
-                        text={category.name} 
                         color={ressourceForm.categories?.includes(category) ? "primary" : "gray"} 
                         onClick={() => { handleAddCategory(category) }} 
-                    />
+                    >{category.name}</Button>
                 ))}
             </div>
         </Fragment>

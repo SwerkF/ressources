@@ -12,6 +12,8 @@ import Profile from './pages/Profile';
 import CreateRessource from './pages/CreateRessource';
 import UserService from './services/UserService';
 import Register from './pages/Register';
+import { ToastContainer, Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserContext = createContext(null);
 
@@ -30,22 +32,35 @@ function App() {
 
   return (
     <Fragment>
-        <Router>
-          <UserContext.Provider value={{user, setUser} as any}>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/ressources" element={<Ressources />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="/create-ressource" element={<CreateRessource />} />
-              {user && (user as any).role === 'ADMIN' && <Route path="/admin" element={<div>Admin</div>} />}
-            </Routes>
-            <Footer />
-          </UserContext.Provider>
-        </Router>
+      <Router>
+        <UserContext.Provider value={{user, setUser} as any}>
+          <Navbar />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+            transition={Bounce}
+          />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/ressources" element={<Ressources />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="/create-ressource" element={<CreateRessource />} />
+            {user && (user as any).role === 'ADMIN' && <Route path="/admin" element={<div>Admin</div>} />}
+          </Routes>
+          <Footer />
+        </UserContext.Provider>
+      </Router>
     </Fragment>
   )
 }

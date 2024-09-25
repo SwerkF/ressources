@@ -15,10 +15,11 @@ const Steps = ({ currentStep, steps, onStepClick } : any) => {
                             </div>
                             <p className="text-xs text-gray-700 dark:text-white">{step.label}</p>
                         </div>
-                        {index < steps.length - 1 && (
-                            <div className={`w-[10rem] h-1 rounded ${currentStep > step.id ? 'bg-blue-600' : 'bg-neutral-500'}`}></div>
-                        )}
+                        
                     </div>
+                        {index < steps.length - 1 && (
+                            <div className={`w-full h-1 rounded ${currentStep > step.id ? 'bg-blue-600' : 'bg-neutral-500'}`}></div>
+                        )}
                 </React.Fragment>
             ))}
         </div>

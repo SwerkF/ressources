@@ -7,17 +7,17 @@ import HOneFormBlock from '../Blocks/Form/HOneFormBlock';
 import HTwoFormBlock from '../Blocks/Form/HTwoFormBlock';
 import CodeFormBlock from '../Blocks/Form/CodeFormBlock';
 
-const CreateRessourceStepTwo = ({ ressource, setRessource } : any) => {
+const CreateRessourceStepTwo = ({ ressourceForm, setRessourceForm } : any) => {
 
     const [blocks, setBlocks] = useState<any>([]);
     const [nextId, setNextId] = useState(1);
 
     useEffect(() => {
-        if (ressource.content) {
-            setBlocks(ressource.content);
-            console.log('Initial blocks set from ressource content:', ressource.content);
+        if (ressourceForm.content) {
+            setBlocks(ressourceForm.content);
+            console.log('Initial blocks set from ressourceForm content:', ressourceForm.content);
         }
-    }, [ressource.content]);
+    }, [ressourceForm.content]);
 
     const handleCreateBlock = (type:string) => {
         const newBlock = {
@@ -28,7 +28,7 @@ const CreateRessourceStepTwo = ({ ressource, setRessource } : any) => {
         console.log('Creating new block:', newBlock);
         setBlocks([...blocks, newBlock]);
         setNextId(nextId + 1);
-        setRessource({ ...ressource, content: [...ressource.content, newBlock] });
+        setRessourceForm({ ...ressourceForm, content: [...ressourceForm.content, newBlock] });
     };
 
     const handleValueChange = (id:string, value:any) => {
@@ -39,7 +39,7 @@ const CreateRessourceStepTwo = ({ ressource, setRessource } : any) => {
         });
         console.log('Updated blocks after value change:', updatedBlocks);
         setBlocks(updatedBlocks);
-        setRessource({ ...ressource, content: updatedBlocks });
+        setRessourceForm({ ...ressourceForm, content: updatedBlocks });
     };
 
     const handleDeleteBlock = (id:string) => {
@@ -47,7 +47,7 @@ const CreateRessourceStepTwo = ({ ressource, setRessource } : any) => {
         const updatedBlocks = blocks.filter((block:any) => block.id !== id);
         console.log('Updated blocks after deletion:', updatedBlocks);
         setBlocks(updatedBlocks);
-        setRessource({ ...ressource, content: updatedBlocks });
+        setRessourceForm({ ...ressourceForm, content: updatedBlocks });
     };
 
     return (

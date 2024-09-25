@@ -41,10 +41,14 @@ const Navbar = () => {
                     {!user ? (
                         <div className="flex flex-row gap-3">
                             <Link to="/login">        
-                                <Button color="primary" size="sm" text="Sign In" />
+                                <Button color="primary" size="sm">
+                                    Connexion
+                                </Button>
                             </Link>
                             <Link to="/register">
-                                <Button color="secondary" size="sm" text="Sign Up" />
+                                <Button color="secondary" size="sm">
+                                    Inscription
+                                </Button>
                             </Link>
                         </div>
                     ) : (

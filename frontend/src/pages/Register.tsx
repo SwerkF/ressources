@@ -8,25 +8,25 @@ import Input from '../components/Input';
 import Button from '../components/Button/Button';
 import { ArrowsClockwise, X, XLogo , GithubLogo, InstagramLogo, LinkedinLogo } from '@phosphor-icons/react';
 import RandomAvatar from '../components/Avatar/RandomAvatar';
+import { Cookies } from 'react-cookie';
+import Steps from '../components/Steps';
+import { toast } from 'react-toastify';
 
 const userService = new UserService();
 
 const user = z.object({
-    name: z.string().nonempty({ message: "Name is required" }),
-    email: z.string().email({ message: "Invalid email" }),
+    name: z.string().nonempty({ message: "Vous devez choisir un nom" }),
+    email: z.string().email({ message: "L'email est invalide" }),
     bio: z.string().optional(),
     interests: z.array(z.string()),
     socials: z.object({
-        github: z.string().optional().refine((value) => !value || /^https:\/\/github\.com/.test(value), { message: "Invalid GitHub URL" }),
-        linkedin: z.string().optional().refine((value) => !value || /^https:\/\/www\.linkedin\.com/.test(value), { message: "Invalid LinkedIn URL" }),
+        github: z.string().optional().refine((value) => !value || /^https:\/\/github\.com/.test(value), { message: "L'URL Github est invalide" }),
+        linkedin: z.string().optional().refine((value) => !value || /^https:\/\/[a-zA-Z]{1,3}\.linkedin\.com/.test(value), { message: "L'URL Linkedin est invalide" }),
         x: z.string().optional().refine((value) => !value || /^https:\/\/x\.com/.test(value), { message: "Invalid X URL" }),
-        instagram: z.string().optional().refine((value) => !value || /^https:\/\/www\.instagram\.com/.test(value), { message: "Invalid Instagram URL" }),
+        instagram: z.string().optional().refine((value) => !value || /^https:\/\/www\.instagram\.com/.test(value), { message: "L'URL Instagram est invalide" }),
     }).optional(),
-    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-    confirmPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords must match",
-    path: ["confirmPassword"],
+    password: z.string().refine((value) => !value || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&+])[A-Za-z\d@$!%*?&+]{8,}$/.test(value), { message: "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un ou plusieurs caractères spéciaux" }),
+    confirmPassword: z.string(),
 });
 
 
@@ -74,25 +74,25 @@ const Register = () => {
 
     const handleRegister = async (e: any) => {
         e.preventDefault();
-        try {
-            // valide user
-            const parsedUser = user.safeParse(userForm);
-            if (!parsedUser.success) {
-                console.log(parsedUser.error.errors);
-                setErrors(parsedUser.error.errors);
-                return;
-            }
-
-            user.parse(userForm);
-            const res = await userService.register(userForm);
-            console.log(res);
-            if (res) {
-                navigate('/login');
-            }
-            
-        } catch (error: any) {
-            console.log(error.errors[0].message);
+       
+        // valide user
+        const parsedUser = user.safeParse(userForm);
+        if (!parsedUser.success) {
+            console.log(parsedUser.error.errors);
+            setErrors(parsedUser.error.errors);
+            return;
         }
+
+        user.parse(userForm);
+        const res = await userService.register(userForm);
+        if(res.error) {
+            toast.error(res.error);
+            return;
+        }
+        const cookies = new Cookies();
+        cookies.set('sessionId', res.session.id, { path: '/' });
+        window.location.href = '/';
+           
     }
 
     const handleSelectInterest = (interest: string) => {
@@ -112,30 +112,61 @@ const Register = () => {
         handleTryParse(name, value);
     };
 
-    const handleTryParse = (name?:any, value?: any) => {
+    const handleTryParse = (name?: string, value?: any) => {
         try {
-           if(name) {
-                const parsedUser = user.safeParse({...userForm, [name]: value});
+            if (name) {
+
+                if(name === 'confirmPassword') {
+                    if (value !== userForm.password) {
+                        setErrors((prevErrors: any) => ({
+                            ...prevErrors,
+                            [name]: "Les mots de passe ne correspondent pas",
+                        }));
+                        return;
+                    } else {
+                        setErrors((prevErrors: any) => {
+                            const { [name]: removedError, ...rest } = prevErrors;
+                            return rest;
+                        });
+                    }
+                }
+
+                // Récupérer uniquement la validation du champ modifié
+                const parsedField = user.shape[name as keyof typeof user.shape]?.safeParse(value);
+                
+                if (!parsedField?.success) {
+                    // Ajouter ou mettre à jour l'erreur pour le champ concerné
+                    setErrors((prevErrors: any) => ({
+                        ...prevErrors,
+                        [name]: parsedField.error.errors[0].message,
+                    }));
+                } else {
+                    // Supprimer l'erreur pour ce champ s'il est valide
+                    setErrors((prevErrors: any) => {
+                        const { [name]: removedError, ...rest } = prevErrors;
+                        return rest;
+                    });
+                }
+            } else {
+                // Valider l'ensemble du formulaire
+                const parsedUser = user.safeParse(userForm);
                 if (!parsedUser.success) {
-                    setErrors(parsedUser.error.errors);
-                    console.log(parsedUser.error.errors);
+                    // Mettre toutes les erreurs si la validation globale échoue
+                    const allErrors = parsedUser.error.errors.reduce((acc: any, curr: any) => {
+                        acc[curr.path[0]] = curr.message;
+                        return acc;
+                    }, {});
+                    console.log(allErrors);
+                    setErrors(allErrors);
                 } else {
-                     setErrors({});
-                }
-           } else {
-                let parsedUser = user.parse(userForm);
-                if (parsedUser) {
                     setErrors({});
-                } else {
-                    console.log(parsedUser);
                 }
-           }
+            }
         } catch (error) {
             console.log(error);
         }
-    }
+    };
     
-
     const handleChangeSocials = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setUserForm({ ...userForm, socials: { ...userForm.socials, [name]: value } });
@@ -149,13 +180,22 @@ const Register = () => {
                     <div className="text-center">
                         <h1 className="block text-6xl font-bold text-gray-800 dark:text-white">Inscription</h1>
                         <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
-                            Vous avez déjà un compte ?
+                            Vous avez déjà un compte ?&nbsp;
                             <a className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500" onClick={() => { navigate('/login') }} >
                                 Connectez vous
                             </a>
                         </p>
                     </div>
-
+                    <div className='mt-5 w-full'>
+                        <Steps
+                            currentStep={step}
+                            steps={[
+                                { id: 1, label: "Informations" },
+                                { id: 2, label: "Vous" },
+                                { id: 3, label: "Réseaux" }
+                            ]}
+                        />
+                    </div>
                     <div className="mt-5">
                         <form onSubmit={handleRegister} className="flex flex-col gap-5">
                             {step === 1 && (
@@ -197,8 +237,9 @@ const Register = () => {
                                         onChange={handleChange}
                                         error={errors.confirmPassword}
                                     />
-                                        </Fragment>
-                                    )}
+                                   
+                                </Fragment>
+                            )}
                             {step === 2 && (
                                 <Fragment>
                                     <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Qui êtes vous ?</h2>
@@ -267,11 +308,12 @@ const Register = () => {
                                     <Button
                                         type="button"
                                         onClick={() => {
-                                            if(errors ||
+                                            if(Object.keys(errors).length > 0 ||
                                                 !userForm.name ||
                                                 !userForm.email ||
                                                 !userForm.password ||
-                                                !userForm.confirmPassword) {
+                                                !userForm.confirmPassword ||
+                                                userForm.password !== userForm.confirmPassword) {
                                                 return;
                                             } else {
                                                 setStep(2);
@@ -334,7 +376,6 @@ const Register = () => {
                     </div>
                 </div>
 
-                {/* Section Custom Content */}
                 <div className="lg:w-1/2 p-4 sm:p-7 shadow-md rounded-md mt-[100px] min-w-[55%]">
                     <div className='bg-zinc-300 rounded py-10 px-5 h-[100px] border-gray-500'>
                         <div className='absolute cursor-pointer'>
@@ -431,7 +472,6 @@ const Register = () => {
                                     </Fragment>
                                 ) : null}
                     </div>
-                    
                 </div>
             </div>
         </div>

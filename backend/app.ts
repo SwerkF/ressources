@@ -4,6 +4,8 @@ import userRoutes from './src/routes/userRoutes';
 import ressourceRoutes from './src/routes/ressourceRoutes';
 import categoryRoutes from './src/routes/categoryRoutes';
 import contentRoutes from './src/routes/contentRoutes';
+import { Interest } from '@prisma/client';
+import prisma from './src/lib/prisma-client';
 
 const app = express();
 

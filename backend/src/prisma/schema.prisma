@@ -14,13 +14,14 @@ datasource db {
 }
 
 model Profile {
-  id        String   @id @default(cuid())
-  user   User    @relation(fields: [userId], references: [id])
-  userId String  @unique
-  bio       String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  user        User    @relation(fields: [userId], references: [id])
+  userId      String  @unique
+  bio         String?
+  avatarType  String? // Type d'avatar: 'upload' ou 'boring'
+  avatarData  Json?   // Données de configuration de l'avatar ou URL
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model User {
@@ -30,11 +31,25 @@ model User {
   password  String
   role      String   @default("USER")
   isGoogle  Boolean  @default(false)
+  x         String?
+  instagram String?
+  linkedin  String?
+  github    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profile   Profile?
   ratings   Rating[]
   sessions  Session[]
+  interests Interest[]  @relation("UserInterests")
+}
+
+// Interest
+model Interest {
+  id  String    @id @default(uuid())
+  name String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users User[]  @relation("UserInterests")
 }
 
 // Sessions

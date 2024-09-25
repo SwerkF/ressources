@@ -52,9 +52,7 @@ const CreateRessource = () => {
     const handleCheckStep = () => {
         handleResetAlert();
         if (step === 1) {
-            if (handleCheckForm()) {
                 setStep(step + 1);
-            }
         } else if (step === 2) {
             if (handleCheckContent()) {
                 setStep(step + 1);
@@ -81,11 +79,11 @@ const CreateRessource = () => {
                         {alert.message && <Alert message={alert.message} type={alert.type} />}
                     </div>
                     {step === 1 ? (
-                        <CreateRessourceStepOne ressourceForm={ressourceSchema}/>
+                        <CreateRessourceStepOne ressourceForm={ressourceForm} setRessourceForm={setRessourceForm}/>
                     ) : step === 2 ? (
-                        <CreateRessourceStepTwo ressourceForm={ressourceSchema}/>
+                        <CreateRessourceStepTwo ressourceForm={ressourceForm}/>
                     ) : step === 3 && (
-                        <RessourcePreviewModal ressourceForm={ressourceSchema} handleSave={() => { }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
+                        <RessourcePreviewModal ressourceForm={ressourceForm} handleSave={() => { }} show={showModal} handleClose={() => { setShowModal(false); setStep(2) }} />
                     )}
 
                 </div>

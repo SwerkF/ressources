@@ -1,5 +1,6 @@
 import { Cookies } from 'react-cookie';
 import { RegisterForm } from '../types/RegisterForm';
+import { toast } from 'react-toastify';
 
 class UserService {
     private readonly url: string;
@@ -53,6 +54,7 @@ class UserService {
     }
 
     async register(userForm: RegisterForm) {
+        console.log("userForm", userForm);
         try {
             const response = await fetch(`${this.url}/api/users/register`, {
                 method: 'POST',
@@ -63,10 +65,13 @@ class UserService {
             });
 
             const result = await response.json();
+            if(result.error) {
+                toast.error(result.error);
+                throw new Error(result.error);
+            }
             return result;
         } catch (error) {
             console.error('Error during register:', error);
-            throw error;
         }
     }
 

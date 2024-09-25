@@ -1,24 +1,30 @@
-import { Fragment, useContext, useEffect, useState, ChangeEvent } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { z } from "zod";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 import PasswordModal from "../components/Modal/PasswordModal";
 import Button from "../components/Button/Button";
 import UserService from "../services/UserService";
-import InputFile from "../components/InputFile";
 import Input from "../components/Input";
+import UserAvatar from "../components/Avatar/UserAvatar";
+import { toast } from "react-toastify";
+import { Interest } from "../types/Interest";
 
 const userService = new UserService();
 
 // Define a Zod schema for userProfile
 const userProfileSchema = z.object({
-    name: z.string().min(1, { message: "Name is required" }),
-    email: z.string().email({ message: "Invalid email address" }).optional(),
+    name: z.string().nonempty({ message: "Vous devez choisir un nom" }),
+    email: z.string().email({ message: "L'email est invalide" }),
+    interests: z.array(z.string()),
     profile: z.object({
-        bio: z.string().nullable().optional().transform((val) => val ?? ""),
-        image: z.unknown().optional(),
+        bio: z.string().optional(),
     }).optional(),
 });
+
+const interestsList = [
+    'Web', 'Mobile', 'DevOps', 'Data', 'IA', 'Cloud', 'Javascript', 'Python', 'Java', 'PHP', 'Ruby', 'C#', 'C++', 'React', 'Angular', 'Vue', 'Node', 'Express', 'Spring', 'Tailwind', 'Bootstrap', 'Material UI', 'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes'
+];
 
 const Profile = () => {
     const { user } = useContext(UserContext) as any;
@@ -27,20 +33,18 @@ const Profile = () => {
 
     const [userProfile, setUserProfile] = useState(user);
     const [show, setShow] = useState(false);
-    const [image, setImage] = useState<any>(null);
     const [errors, setErrors] = useState<any>({});
 
     useEffect(() => {
+        console.log(user);
         if (!user) {
             navigate('/login');
         }
+        // parse the interests in form of string
+        const interests = user.interests.map((interest: Interest) => interest.name);
+        userProfileSchema.parse({ ...user, interests });
+        
     }, [user]);
-
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setImage(file);
-    }};
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -48,8 +52,12 @@ const Profile = () => {
         // Validate the userProfile data
         const result = userProfileSchema.safeParse(userProfile);
         if (!result.success) {
-            console.log("Validation errors:", result.error);
-            const formattedErrors = result.error.format();
+            toast.error("Veuillez vérifier les erreurs dans le formulaire");
+            // format errors to be key: string
+            const formattedErrors: any = {};
+            result.error.errors.map((error: any) => {
+                formattedErrors[error.path[0]] = error;
+            });
             setErrors(formattedErrors);
             return;
         }
@@ -66,16 +74,12 @@ const Profile = () => {
         if (result.data.profile?.bio) {
             formData.append('bio', result.data.profile.bio);
         }
-        // if image && image size < 10MB
-        if (image && image.size < 10000000) {
-            formData.append('image', image);
-        }
     
         userService.updateProfile(formData).then((res: any) => {
-            console.log("Profile updated successfully:", res);
+            toast.success("Profile mis à jour avec succès !");
             setUser(res);
-        }).catch((error: any) => {
-            console.error("Error updating profile:", error);
+        }).catch(() => {
+            toast.error("Erreur lors de la mise à jour du profile");
         });
     }
     
@@ -84,7 +88,18 @@ const Profile = () => {
             <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
                 <div className="p-4 sm:p-7">
                     <div className="text-center">
-                        <img src={user && user.profile.image} alt="avatar" className="w-32 h-32 object-cover rounded-full mx-auto" />
+                        {user && user.profile && user.profile.avatarType === 'boring' ? (
+                            <div className="flex flex-col items-center">
+                                <UserAvatar 
+                                    size="150px"
+                                    variant={user.profile.avatarData.variant}
+                                    name={user.profile.avatarData.name}
+                                    colors={user.profile.avatarData.colors}
+                                />  
+                            </div>
+                        ) : (
+                            <img src={user?.profile?.avatarData.url} alt="avatar" className="w-20 h-20 object-cover rounded-full" />
+                        )}
                         <h1 className="block text-2xl mt-3 font-bold text-gray-800 dark:text-white">Profile</h1>
                         <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
                             Bienvenue, {user && user.name} !
@@ -111,23 +126,21 @@ const Profile = () => {
                                         </Fragment>
                                     ) : (
                                         <Fragment>
-                                            <label className="text-gray-700 dark:text-neutral-300" htmlFor="email">Email</label>
-                                        <Input
-                                            label="Email"
-                                            type="email"
-                                            placeholder="Email"
-                                            name="email"
-                                            value={userProfile?.email || ''}
-                                            onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
-                                            error={errors.email}
-                                        />
-                                        {errors.email && <p className="text-red-500 text-sm">{errors.email._errors[0]}</p>}
+                                            <Input
+                                                label="Email"
+                                                type="email"
+                                                placeholder="Email"
+                                                name="email"
+                                                value={userProfile?.email || ''}
+                                                onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
+                                                error={errors.email}
+                                            />
                                         </Fragment>
                                     )}
                                     </div>
                                     
                                     <div className="flex flex-col items-start">
-                                        <label className="text-gray-700 dark:text-neutral-300" htmlFor="bio">Bio</label>
+                                        <label className="text-gray-700 dark:text-white" htmlFor="bio">Bio</label>
                                         <textarea
                                             id="bio"
                                             name="bio"
@@ -138,15 +151,26 @@ const Profile = () => {
                                         {errors.profile?.bio && <p className="text-red-500 text-sm">{errors.profile.bio._errors[0]}</p>}
                                     </div>
 
-                                    <InputFile
-                                        label="Image de profile"
-                                        onChange={handleFileChange}
-                                        error={errors.profile?.image?._errors[0]}
-                                    />
-
                                     <div className="flex flex-col items-start">
-                                        <Button color="neutral" size="sm" text="Changer le mot de passe" onClick={() => { setShow(true) }} />
+                                        <label className="text-gray-700 dark:text-white" htmlFor="interests">Mes préférences:</label>
+                                        <div className='text-white text-sm flex flex-row flex-wrap gap-2'>
+                                            {userProfile.interests.map((interest:Interest, index:number) => (
+                                                <div key={index} className={`cursor-pointer px-3 flex flex-row transition-all items-center gap-1 py-1 rounded-full text-sm ${userProfileSchema.interests.includes(interest) ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 dark:bg-neutral-700 dark:text-neutral-400'} `}>
+                                                    {interest.name}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+
+
+
+                                    {/*
+                                        <div className="flex flex-col items-start">
+                                            <Button color="neutral" size="sm" onClick={() => { setShow(true) }}>
+                                                Changer mot de passe
+                                            </Button>
+                                        </div>
+                                    */}
                                     
                                     <div className="flex flex-col items-start">
                                         <button type="submit" className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Mettre à jour</button>
@@ -157,7 +181,7 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-            <PasswordModal show={show} handleClose={() => setShow(false)} user={userProfile} />
+            {/*  <PasswordModal show={show} handleClose={() => setShow(false)} user={userProfile} />*/}
         </div>
     );
 };
