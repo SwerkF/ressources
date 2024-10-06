@@ -1,4 +1,9 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Footer() {
+
+  const navigate = useNavigate();
+
   return (
     <footer className="block bg-black text-white">
       <div className="py-16 md:py-20 mx-auto w-full max-w-7xl px-5 md:px-10">
