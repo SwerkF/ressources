@@ -6,7 +6,7 @@ export interface RessourceCardProps {
   id: number;
   title: string;
   image: string;
-  description: string;
+  description?: string;
   categories: string[];
   author?: {
     name: string;
@@ -24,12 +24,13 @@ export default function RessourceCard({
   author,
   date,
 }: RessourceCardProps) {
-  const truncate = (str: string, n: number) => {
+  const truncate = (str: string | undefined, n: number) => {
+    if (!str) return "";
     return str.length > n ? str.substr(0, n - 1) + "..." : str;
   };
 
   return (
-    <div className="mb-12 inline-block border border-solid border-gray-300 md:mb-8 lg:mb-10 max-w-full md:max-w-xs lg:max-w-sm">
+    <div className="mb-12 inline-block border border-solid border-gray-300 md:mb-8 lg:mb-10 max-w-full md:max-w-xs lg:max-w-sm bg-white">
       <img
         src={image}
         alt={title}
@@ -47,7 +48,7 @@ export default function RessourceCard({
               <p>{category}</p>
             </div>
           ))}
-          {categories.length > 2 && (
+          {categories && categories.length > 2 && (
             <div className="rounded-sm bg-gray-300 p-2 text-sm font-semibold uppercase text-gray-700">
               <p>+{categories.length - 3} more</p>
             </div>

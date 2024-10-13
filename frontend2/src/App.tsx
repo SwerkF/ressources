@@ -4,6 +4,7 @@ import Footer from "./components/Footer/Footer";
 import Navbar from "./components/Navbar/Navbar";
 import Error404 from "./pages/Errors/404";
 import Ressources from "./pages/Ressources";
+import Login from "./pages/Login";
 
 function Layout() {
   return (
@@ -13,6 +14,7 @@ function Layout() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/ressources" element={<Ressources />} />
+          <Route path="/login" element={<Login />} />
           <Route path="*" element={<Error404 />} />
         </Routes>
       </div>
