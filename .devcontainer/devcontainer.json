@@ -1,7 +1,7 @@
 {
     "name": "My Fullstack App",
     "dockerComposeFile": [
-      "docker-compose.yml"
+      ".devcontainer/docker-compose.yml"
     ],
     "service": "app",
     "workspaceFolder": "/workspace",

@@ -1,13 +1,13 @@
 services:
   app:
     build:
-      context: ../ # Point vers le dossier racine de votre projet
+      context: ../
       dockerfile: Dockerfile
     ports:
-      - "5173:5173" # Port pour le frontend
-      - "3000:3000" # Port pour l'API backend
+      - "5173:5173"
+      - "3000:3000"
     volumes:
-      - ..:/workspace:cached # Montez le répertoire de travail
+      - ..:/workspace:cached
     environment:
       NODE_ENV: development
 
