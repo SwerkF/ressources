@@ -1,11 +1,12 @@
-# Utiliser une image de base avec Node.js et un client MySQL
-FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:20
+FROM node:18
 
-# Installer MySQL client
-RUN apt-get update && apt-get install -y mysql-client
+# Install basic development tools
+RUN apt update && apt install -y less git
 
-# Exposer les ports nécessaires
-EXPOSE 5173 3000
+# Ensure default `node` user has access to `npm` cache
+RUN mkdir -p /home/node/.npm && \
+    chown -R node:node /home/node
 
-# Définir le répertoire de travail
 WORKDIR /workspace
+
+USER node

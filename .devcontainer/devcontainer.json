@@ -1,20 +1,17 @@
 {
-    "name": "My Fullstack App",
-    "dockerComposeFile": [
-      ".devcontainer/docker-compose.yml"
-    ],
-    "service": "app",
-    "workspaceFolder": "/workspace",
-    "forwardPorts": [5173, 3000],
-    "customizations": {
-      "vscode": {
-        "extensions": [
-          "dbaeumer.vscode-eslint",
-          "esbenp.prettier-vscode"
-        ]
-      }
-    },
-    "postCreateCommand": "npm install --prefix backend && npm install --prefix frontend",
-    "remoteUser": "vscode"
-  }
-  
+  "name": "Node.js & MySQL",
+  "dockerComposeFile": "docker-compose.yaml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-tslint-plugin"
+      ]
+    }
+  },
+  "forwardPorts": [3000, 3306, 5173],
+  "postCreateCommand": "cd frontend && npm install && cd ../backend && npm install"
+}

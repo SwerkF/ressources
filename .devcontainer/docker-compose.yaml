@@ -1,27 +1,21 @@
 services:
   app:
-    build:
-      context: ../
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-      - "3000:3000"
+    build: 
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
     volumes:
       - ..:/workspace:cached
-    environment:
-      NODE_ENV: development
+    command: sleep infinity
+    network_mode: service:db
 
   db:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: app
     volumes:
-      - db-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
 
 volumes:
-  db-data:
+  mysql-data:
