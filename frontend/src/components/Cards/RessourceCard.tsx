@@ -1,69 +1,72 @@
-import { Ressource } from "../../types/Ressource";
-import Badge from "../Badge/Badge";
-import CategoryBadge from "../Badge/CategoryBadge";
-import Button from "../Button/Button";
+import { Button } from "@rewind-ui/core";
+import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const RessourceCard = ({ ressource, onClick }:  { ressource: Ressource, onClick: (ressource: Ressource) => void }) => {
-
-    const handleDateCalc = (date: string) => {
-
-        const currentDate = new Date();
-        const createdAt = new Date(date);
-        const diff = currentDate.getTime() - createdAt.getTime();
-        const seconds = Math.floor(diff / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-        const weeks = Math.floor(days / 7);
-        const months = Math.floor(weeks / 4);
-        const years = Math.floor(months / 12);
-
-        if (years > 0) {
-            return `${years} years ago`;
-        } else if (months > 0) {
-            return `${months} months ago`;
-        } else if (weeks > 0) {
-            return `${weeks} weeks ago`;
-        } else if (days > 0) {
-            return `${days} days ago`;
-        } else if (hours > 0) {
-            return `${hours} hours ago`;
-        } else if (minutes > 0) {
-            return `${minutes} minutes ago`;
-        } else {
-            return `${seconds} seconds ago`;
-        }
-    }
-
-    return (
-        <div className="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-neutral-700/70">
-            <img className="w-auto min-h-60 object-cover rounded-t-xl" src={ressource.image} alt={ressource.title} />
-            <div className="p-4 md:p-5">
-                <h3 className="text-lg font-bold text-gray-800 dark:text-white">
-                    {ressource.title}
-                </h3>
-                <div className="flex flex-wrap gap-2 mt-1">
-                    {ressource.categories.map((category, index) => (
-                        (index < 3) ? (
-                            <CategoryBadge key={index} category={category} />
-                        ) : (
-                            (index == 3) ? (
-                                <Badge key={index} color="secondary" text={`+${ressource.categories.length - 3}`} />
-                            ) : (
-                                null
-                            )
-                        )
-                    ))}
-                </div>
-                <div className="mt-4">
-                    <Button onClick={() => { onClick(ressource) }} className="mt-3" color="primary" size="sm" text="View ressource"></Button>
-                </div>
-                <p className="mt-5 text-xs text-gray-500 dark:text-neutral-500">
-                    Published {handleDateCalc(ressource.createdAt)}
-                </p>
-            </div>
-        </div>
-    );
+export interface RessourceCardProps {
+  id: number;
+  title: string;
+  image: string;
+  description?: string;
+  categories: string[];
+  author?: {
+    name: string;
+    avatar: string;
+  };
+  date?: string;
 }
 
-export default RessourceCard;
+export default function RessourceCard({
+  id,
+  title,
+  image,
+  description,
+  categories,
+  author,
+  date,
+}: RessourceCardProps) {
+  const truncate = (str: string | undefined, n: number) => {
+    if (!str) return "";
+    return str.length > n ? str.substr(0, n - 1) + "..." : str;
+  };
+
+  return (
+    <div className="mb-12 inline-block border border-solid border-gray-300 md:mb-8 lg:mb-10 max-w-full md:max-w-xs lg:max-w-sm bg-white">
+      <img
+        src={image}
+        alt={title}
+        className="max-h-64 object-cover sm:object-fit w-full"
+      />
+      <div className="px-5 py-8 sm:px-6 h-full">
+        <h5 className="mb-3 text-xl font-bold">{title}</h5>
+        <p className="flex-col text-gray-500">{truncate(description, 140)}</p>
+        <div className="mb-5 mt-6 flex flex-wrap gap-2 md:mb-6 lg:mb-8">
+          {categories.slice(0, 2).map((category, index) => (
+            <div
+              key={index}
+              className="rounded-sm bg-gray-300 p-2 text-sm font-semibold uppercase text-gray-700"
+            >
+              <p>{category}</p>
+            </div>
+          ))}
+          {categories && categories.length > 2 && (
+            <div className="rounded-sm bg-gray-300 p-2 text-sm font-semibold uppercase text-gray-700">
+              <p>+{categories.length - 3} more</p>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <a
+            href="#"
+            className="flex items-center max-w-full gap-2.5 hover:gap-3 text-sm font-bold uppercase text-black transition transform hover:translate-x-1.5"
+          >
+            <p>Site web</p>
+            <ArrowRight className="inline-block" />
+          </a>
+          <Button className="inline-flex gap-3 px-4 py-7 text-lg font-medium text-white bg-black">
+            Découvrir
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

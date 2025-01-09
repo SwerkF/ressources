@@ -1,70 +1,76 @@
-import { useState, Fragment, useEffect, createContext } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing";
+import Footer from "./components/Footer/Footer";
+import Navbar from "./components/Navbar/Navbar";
+import Error404 from "./pages/Errors/404";
+import Ressources from "./pages/Ressources";
+import Login from "./pages/Login";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import useAuthStore from "./store/useAuthStore";
+import { useEffect } from "react";
+import AppService from "./services/AppService";
+import toast, { Toaster } from "react-hot-toast";
+import Profile from "./pages/Profile/Profile";
+import CreateRessource from "./pages/CreateRessource/CreateRessource";
 
-import Home from './pages/Home'
-import About from './pages/About'
-import Ressources from './pages/Ressources';
-import Navbar from './components/Navbar'
-import Footer from './components/Footer';
-import Login from './pages/Connection';
-import Profile from './pages/Profile';
+function Layout() {
 
-import CreateRessource from './pages/CreateRessource';
-import UserService from './services/UserService';
-import Register from './pages/Register';
-import { ToastContainer, Bounce } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-const UserContext = createContext(null);
-
-const userService = new UserService();
-
-function App() {
-
-  const [user, setUser] = useState(null);
+  const { isAuthenticated, setIsAuthenticated, setUser } = useAuthStore();
 
   useEffect(() => {
-    userService.getProfile().then((res: any) => {
-      setUser(res);
-    });
-  }, []);
-    
+    if(!isAuthenticated) {
+      let session = localStorage.getItem('session');
+      if(!session) {
+        return;
+      }
+      try {
+        AppService.me(session).then((data) => {
+          if(data.error) {
+            toast.error("Erreur lors de la récupération de votre session");
+            return;
+          }
+
+          setIsAuthenticated!(true);
+          setUser!(data.data);
+          
+        });
+      } catch (error) {
+        toast.error('Erreur lors de la récupération de votre session');
+      }
+    }
+  }, [isAuthenticated])
+
+  const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
+
+  }
 
   return (
-    <Fragment>
-      <Router>
-        <UserContext.Provider value={{user, setUser} as any}>
+    <div className="flex flex-col min-h-dvh bg-yellow-50">
+      <div className="flex-grow">
+        <Toaster />
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
           <Navbar />
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-            transition={Bounce}
-          />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="/create-ressource" element={<CreateRessource />} />
-            {user && (user as any).role === 'ADMIN' && <Route path="/admin" element={<div>Admin</div>} />}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/create" element={<CreateRessource />} />
+            <Route path="*" element={<Error404 />} />
           </Routes>
-          <Footer />
-        </UserContext.Provider>
-      </Router>
-    </Fragment>
-  )
+        </GoogleOAuthProvider>
+      </div>
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <Layout />
+    </Router>
+  );
+}
 
-export { UserContext }
+export default App;

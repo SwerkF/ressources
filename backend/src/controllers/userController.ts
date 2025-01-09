@@ -1,298 +1,375 @@
-import { Request, Response } from 'express';
-import prisma from '../lib/prisma-client';
-import adapter from '../lib/lucia';
-import { Lucia, TimeSpan } from "lucia";
-import bcrypt from 'bcrypt';
-import { OAuth2Client } from 'google-auth-library';
-import sharp from 'sharp';
-import crypto from 'crypto';
-import { userPostSchema } from '../lib/requestSchemas';
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-import fs from 'fs';
-import path from 'path';
+import { Request, Response } from "express";
+import prisma from "../lib/prisma-client";
+import bcrypt from "bcrypt";
+import { userPostSchema } from "../lib/requestSchemas";
+import { AvatarType } from "@prisma/client";
+import lucia from '../lib/lucia-client';
 
-const lucia = new Lucia(adapter, {
-    sessionExpiresIn: new TimeSpan(2, "w")
-});
+// router.get('/', getUsers);
+export const getUsers = async (req: Request, res: Response) => {};
 
-export const getUsers = async (req: Request, res: Response) => {
-    try {
-        const users = await prisma.user.findMany();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ status: 500, error: 'Erreur serveur' });
-    }
-};
+// router.get('/:id', getUserById);
+export const getUserById = async (req: Request, res: Response) => {};
 
-export const getUserById = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const user = await prisma.user.findUnique({
-            where: { id: id }
-        });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ status: 500, error: 'Erreur serveur' });
-    }
-};
-
+// router.post('/register', createUser);
 export const createUser = async (req: Request, res: Response) => {
-    try  {
-        // Validate the request body
-        const userForm = req.body;
-        const validatedUserForm = await userPostSchema(userForm);
+  const user = req.body;
 
-        // Check if the user already exists
-        const user = await prisma.user.findUnique({
-            where: { email: validatedUserForm.email }
-        });
+  try {
+    await userPostSchema.validate(user);
+  } catch (error: any) {
+    return res.status(400).json({ error: error.errors });
+  }
 
-        if (user) {
-            return res.status(400).json({ status: 400, error: "L'email est déjà utilisé" });
-        }
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email: user.email,
+    },
+  });
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(userForm.password, 10);
+  if (existingUser) {
+    return res.status(400).json({
+      error: "L'utilisateur existe déjà",
+      status: 400,
+    });
+  }
 
-        // Create the user
-        const newUser = await prisma.user.create({
-            data: {
-                email: userForm.email,
-                name: userForm.name,
-                password: hashedPassword,
-                profile: {
-                    create: {
-                    bio: userForm.bio,
-                    avatarType: 'boring',
-                    avatarData: {
-                        name: userForm.avatar.name,
-                        colors: userForm.avatar.colors,
-                        variant: userForm.avatar.variant
-                    }
-                    }
-                },
-                x: userForm.socials.x,
-                instagram: userForm.socials.instagram,
-                linkedin: userForm.socials.linkedin,
-                github: userForm.socials.github,
-            }
-        });
+  // compare password and confirm password
+  if (user.password !== user.confirmPassword) {
+    return res.status(400).json({
+      error: "Les mots de passe ne correspondent pas",
+      status: 400,
+    });
+  }
 
-        for (const interestName of userForm.interests) {
-            const interest = await prisma.interest.findUnique({
-                where: { name: interestName }
-            });
+  // hash password
+  const hashedPassword = await bcrypt.hash(user.password, 10);
 
-            if (interest) {
-                await prisma.user.update({
-                    where: { id: newUser.id },
-                    data: {
-                        interests: {
-                            connect: {
-                                id: interest.id
-                            }
-                        }
-                    }
-                });
-            }
-        }
+  // create user
+  const newUser = await prisma.user.create({
+    data: {
+      email: user.email,
+      name: user.name,
+      password: hashedPassword,
+      bio: user.bio,
+      avatarType: user.avatarType,
+      avatarData: user.avatarData,
+      socialMedias: {
+        create: user.socialMedias,
+      },
+    },
+  });
 
-        // create prisma session
-        const session = await lucia.createSession(newUser.id.toString(), {});
+  // for each interest, find it and append it to user
+  for (const interest of user.interests) {
+    const existingInterest = await prisma.interest.findUnique({
+      where: {
+        name: interest,
+      },
+    });
 
-        // return
-        res.status(201).json({ status: 201, message: 'Profile crée!', user: newUser, session });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: 'Erreur serveur' });
+    if (existingInterest) {
+      await prisma.user.update({
+        where: {
+          id: newUser.id,
+        },
+        data: {
+          interests: {
+            connect: {
+              id: existingInterest.id,
+            },
+          },
+        },
+      });
+    } else {
+      const newInterest = await prisma.interest.create({
+        data: {
+          name: interest,
+        },
+      });
+
+      await prisma.user.update({
+        where: {
+          id: newUser.id,
+        },
+        data: {
+          interests: {
+            connect: {
+              id: newInterest.id,
+            },
+          },
+        },
+      });
     }
+  }
 
+  res.status(201).json({
+    message: "Utilisateur créé avec succès",
+    status: 201,
+    data: newUser,
+  });
 };
 
-export const googleLogin = async (req: Request, res: Response) => {
-    try {
-        const { tokenId } = req.body; 
-
-        const ticket = await client.verifyIdToken({
-            idToken: tokenId,
-            audience: process.env.GOOGLE_CLIENT_ID
-        });
-
-        const payload = ticket.getPayload()!;
-        const email = payload.email!;
-        const name = payload.name!;
-        console.log(payload)
-
-        // Vérifie si l'utilisateur existe
-        let user = await prisma.user.findUnique({
-            where: { email }
-        });
-
-        // Si l'utilisateur n'existe pas, le crée
-        if (!user) {
-            user = await prisma.user.create({
-                data: {
-                    email,
-                    name,
-                    password: '', // Add the required password property
-                    isGoogle: true
-                }
-            });
-            
-            let profile = await prisma.profile.create({
-                data: {
-                    userId: user.id,
-                    bio: '',
-                    avatarType: 'upload',
-                    avatarData: {
-                        url: payload.picture
-                    }
-                }
-            });
-        };
-
-        // Crée une session lucia
-        const session = await lucia.createSession(user.id.toString(), {});
-
-        res.json({ status: 200, message: 'Connecté!', user, session });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: 'Erreur serveur' });
-    };
-};
-
+// router.post('/login', loginUser);
 export const loginUser = async (req: Request, res: Response) => {
-    try {
-        const { email, password } = req.body;
+  const { email, password, loginType, accessToken } = req.body;
 
-        // Vérifie si l'utilisateur existe
-        const user = await prisma.user.findUnique({
-            where: { email, isGoogle: false}
-        });
+  if (loginType === "google") {
+    return await googleLogin(accessToken, res);
+  } else if (loginType === "github") {
+    return await githubLogin(accessToken, res);
+  }
 
-        if (!user) {
-            return res.status(400).json({ status: 400, error: 'Vérifiez les informations saisies.' });
-        }
+  return res.status(400).json({
+    error: "Type de connexion non pris en charge",
+    status: 400,
+  })
+};
 
-        // Vérifie le mot de passe
-        const passwordMatch = await bcrypt.compare(password, user.password);
+const googleLogin = async (accessToken: string, res: Response) => {
+  const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
-        if (!passwordMatch) {
-            return res.status(400).json({ status: 400, error: 'Vérifiez les informations saisies.' });
-        }
+  if (!response.ok) {
+    return res.status(400).json({
+      error: 'Unable to fetch user info from Google',
+      status: response.status,
+    });
+  }
 
-        // Crée une session lucia
-        const session = await lucia.createSession(user.id.toString(), {});
+  const userInfo = await response.json();
 
-        res.status(200).json({ status: 200, message: 'Connecté!', user, session });
-    } catch (error) {
-        res.status(500).json({ status: 500, error: 'Erreur serveur' });
-    }
-}
+  const email = userInfo.email;
+  if (!email) {
+    return res.status(400).json({
+      error: "Email non trouvé",
+      status: 400,
+    });
+  }
 
-// getProfile with JWT
+  let user = await prisma.user.findUnique({
+    where: { email },
+    include: { authProviders: true },
+  });
 
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        uniqueuser: userInfo.name.toLowerCase(),
+        name: userInfo.name,
+        password: '',
+        avatarType: AvatarType.UPLOAD,
+        avatarData: userInfo.picture,
+      },
+    });
+
+    await prisma.authProvider.create({
+      data: {
+        userId: user!.id,
+        name: "GOOGLE",
+      },
+    });
+  } else if (user.authProviders.length !== 0 && user.authProviders[0].name !== "GOOGLE") {
+    return res.status(400).json({
+      error: "Email déjà utilisé pour un autre service.",
+      status: 400,
+    });
+  }
+
+  const session = await lucia.createSession(user!.id, {});
+
+  res.status(200).json({
+    message: "Connexion réussie",
+    status: 200,
+    data: { user, session },
+  });
+};
+
+const githubLogin = async (accessToken: string, res: Response) => {
+  const response = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      client_id: process.env.GITHUB_CLIENT_ID,
+      client_secret: process.env.GITHUB_CLIENT_SECRET,
+      code: accessToken,
+    }),
+  });
+
+  if (!response.ok) {
+    return res.status(400).json({
+      error: 'Unable to fetch access token from GitHub',
+      status: response.status,
+    });
+  }
+
+  const data = await response.json();
+  const access_token = data.access_token;
+
+  const userResponse = await fetch('https://api.github.com/user', {
+    headers: {
+      Authorization: `token ${access_token}`,
+    },
+  });
+
+  if (!userResponse.ok) {
+    return res.status(400).json({
+      error: 'Unable to fetch user info from GitHub',
+      status: userResponse.status,
+    });
+  }
+
+  const userInfo = await userResponse.json();
+
+  const emailsResponse = await fetch('https://api.github.com/user/emails', {
+    headers: {
+      Authorization: `token ${access_token}`,
+    },
+  });
+
+  if (!emailsResponse.ok) {
+    return res.status(400).json({
+      error: 'Unable to fetch user emails from GitHub',
+      status: emailsResponse.status,
+    });
+  }
+
+  const emails = await emailsResponse.json();
+  const primaryEmail = emails.find((email: any) => email.primary)?.email;
+
+  if (!primaryEmail) {
+    return res.status(400).json({
+      error: "Primary email not found",
+      status: 400,
+    });
+  }
+
+  const email = primaryEmail;
+  if (!email) {
+    return res.status(400).json({
+      error: "Email non trouvé",
+      status: 400,
+    });
+  }
+
+  let user = await prisma.user.findUnique({
+    where: { email },
+    include: { authProviders: true },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        uniqueuser: userInfo.name.toLowerCase(),
+        name: userInfo.name,
+        password: '',
+        bio: userInfo.bio,
+        avatarType: AvatarType.UPLOAD,
+        avatarData: userInfo.avatar_url,
+      },
+    });
+
+    await prisma.authProvider.create({
+      data: {
+        userId: user?.id,
+        name: "GITHUB",
+      },
+    });
+  } else if (user.authProviders.length !== 0 && user.authProviders[0].name !== "GITHUB") {
+    return res.status(400).json({
+      error: "Email déjà utilisé pour un autre service.",
+      status: 400,
+    });
+  }
+
+  const session = await lucia.createSession(user!.id, {});
+
+
+  res.status(200).json({
+    message: "Connexion réussie",
+    status: 200,
+    data: { user, session },
+  });
+};
+
+/**
+ * Removed temporarily
+ */
+
+/*
+const classicLogin = async (email: string, password: string, res: Response) => {
+  if (!email || !password) {
+    return res.status(400).json({
+      error: "Email et mot de passe requis",
+      status: 400,
+    });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    return res.status(404).json({
+      error: "Utilisateur non trouvé",
+      status: 404,
+    });
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    return res.status(400).json({
+      error: "Mot de passe incorrect",
+      status: 400,
+    });
+  }
+
+  const session = await lucia.createSession(user.id, {});
+
+  res.status(200).json({
+    message: "Connexion réussie",
+    status: 200,
+    data: {
+      user,
+      session,
+    },
+  });
+};
+*/
+
+// router.get('/me', authenticateJWT, getProfile);
 export const getProfile = async (req: Request, res: Response) => {
-   try {
-        const { user } = req;
-        
-        // user.id 
-        const userProfile = await prisma.user.findUnique({
-            select : {
-                id: true,
-                name: true,
-                email: true,
-                x: true,
-                instagram: true,
-                linkedin: true,
-                github: true,
-                isGoogle: true,
-                role: true,
-                profile: true,
-                createdAt: true,
-            },
-            where: { id: user.id }
-        });
+  const user = req.user;
 
-        // get every interest. If user is interested in it, set it to true, else false
-        const interests = await prisma.interest.findMany();
-        const userInterests = await prisma.user.findUnique({
-            select: {
-                interests: {
-                    select: {
-                        id: true
-                    }
-                }
-            },
-            where: { id: user.id }
-        });
+  const completeUser = await prisma.user.findUnique({
+    where: {
+      id: user.id,
+    },
+    include: {
+      socialMedias: true,
+      interests: true,
+    },
+  });
 
-        const userInterestIds = userInterests!.interests.map(interest => interest.id);
-        const userInterestsMap = interests.map(interest => {
-            return {
-                ...interest,
-                selected: userInterestIds.includes(interest.id)
-            }
-        });
-
-        (userProfile as any).interests = userInterestsMap;
-
-
-        res.json(userProfile);
-   } catch (error) {
-         res.status(500).json({ status: 500, error: 'Erreur serveur' });
-   }
-}
+  res.status(200).json({
+    message: "Profil récupéré avec succès",
+    status: 200,
+    data: completeUser,
+  });
+};
 
 
 //router.put('/me', authenticateJWT, updateProfile);
-export const updateProfile = async (req: Request, res: Response) => {
-    try {
-        const { user } = req;
-        const { name, email, bio } = req.body;
-        // get user with profile
-        const userProfile = await prisma.user.findUnique({
-            select : {
-                email: true,
-                name: true,
-                id: true,
-                isGoogle: true,
-                role: true,
-                profile: true
-            },
-            where: { id: user.id }
-        });
-
-        if(!userProfile) return res.status(404).json({ error: 'User not found' });
-
-        const updatedUser = await prisma.user.update({
-            where: { id: user.id },
-            data: {
-            email,
-            name,
-            profile: {
-                update: {
-                    bio,
-                }
-            }
-            }
-        });
-
-        const returnUser = await prisma.user.findUnique({
-            select : {
-                email: true,
-                name: true,
-                id: true,
-                isGoogle: true,
-                role: true,
-                profile: true
-            },
-            where: { id: user.id }
-        });
-
-        res.json(returnUser);
-    } catch (error) {
-        res.status(500).json({ status: 500, error: 'Erreur serveur' });
-    }
-}
+export const updateProfile = async (req: Request, res: Response) => {};
