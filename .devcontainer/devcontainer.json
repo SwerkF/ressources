@@ -4,9 +4,6 @@
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
             "version": "18"
-        },
-        "ghcr.io/devcontainers/features/mysql:1": {
-            "version": "8.0"
         }
     },
     "customizations": {
@@ -19,6 +16,6 @@
             ]
         }
     },
-    "forwardPorts": [3000, 5000, 3306],
+    "forwardPorts": [3000, 5000, 5173],
     "postCreateCommand": "npm install && npm run build"
 }
