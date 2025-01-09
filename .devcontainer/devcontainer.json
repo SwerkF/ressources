@@ -1,22 +1,20 @@
 {
     "name": "My Fullstack App",
-    "dockerComposeFile": "docker-compose.yaml",
+    "dockerComposeFile": [
+      "docker-compose.yml"
+    ],
     "service": "app",
     "workspaceFolder": "/workspace",
+    "forwardPorts": [5173, 3000],
     "customizations": {
       "vscode": {
-        "settings": {
-          "terminal.integrated.defaultProfile.linux": "bash"
-        },
         "extensions": [
           "dbaeumer.vscode-eslint",
-          "esbenp.prettier-vscode",
-          "ms-azuretools.vscode-docker",
-          "ms-vscode.vscode-typescript-next"
+          "esbenp.prettier-vscode"
         ]
       }
     },
-    "forwardPorts": [5173, 3000],
     "postCreateCommand": "npm install --prefix backend && npm install --prefix frontend",
     "remoteUser": "vscode"
-}
+  }
+  
