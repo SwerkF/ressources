@@ -1,24 +1,22 @@
 {
-    "name": "Full Stack Development Environment",
-    "image": "mcr.microsoft.com/devcontainers/javascript-node:1-bullseye",
-    "features": {
-        "ghcr.io/devcontainers/features/node:1": {
-            "version": "20.11.0"
-        },
-        "ghcr.io/devcontainers/features/mysql:1": {
-            "version": "8.0"
-        }
-    },
+    "name": "My Fullstack App",
+    "dockerComposeFile": "docker-compose.yaml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
     "customizations": {
-        "vscode": {
-            "extensions": [
-                "dbaeumer.vscode-eslint",
-                "esbenp.prettier-vscode",
-                "ms-azuretools.vscode-docker",
-                "ms-typescript.js-debug"
-            ]
-        }
+      "vscode": {
+        "settings": {
+          "terminal.integrated.defaultProfile.linux": "bash"
+        },
+        "extensions": [
+          "dbaeumer.vscode-eslint",
+          "esbenp.prettier-vscode",
+          "ms-azuretools.vscode-docker",
+          "ms-vscode.vscode-typescript-next"
+        ]
+      }
     },
-    "forwardPorts": [3000, 5000, 5173],
-    "postCreateCommand": "npm install -g npm@latest"
+    "forwardPorts": [5173, 3000],
+    "postCreateCommand": "npm install --prefix backend && npm install --prefix frontend",
+    "remoteUser": "vscode"
 }
