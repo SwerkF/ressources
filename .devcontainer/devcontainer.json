@@ -1,9 +1,12 @@
 {
     "name": "Full Stack Development Environment",
-    "image": "mcr.microsoft.com/devcontainers/typescript-node:1-bullseye",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:1-bullseye",
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
-            "version": "18"
+            "version": "20.11.0"
+        },
+        "ghcr.io/devcontainers/features/mysql:1": {
+            "version": "8.0"
         }
     },
     "customizations": {
@@ -17,5 +20,5 @@
         }
     },
     "forwardPorts": [3000, 5000, 5173],
-    "postCreateCommand": "npm install && npm run build"
+    "postCreateCommand": "npm install -g npm@latest"
 }
