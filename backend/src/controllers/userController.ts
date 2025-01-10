@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../lib/prisma-client";
 import bcrypt from "bcrypt";
 import { userPostSchema } from "../lib/requestSchemas";
-import { AvatarType } from "@prisma/client";
+
 import lucia from '../lib/lucia-client';
 
 // router.get('/', getUsers);
@@ -163,7 +163,7 @@ const googleLogin = async (accessToken: string, res: Response) => {
         uniqueuser: userInfo.name.toLowerCase(),
         name: userInfo.name,
         password: '',
-        avatarType: AvatarType.UPLOAD,
+        avatarType: "upload",
         avatarData: userInfo.picture,
       },
     });
@@ -273,7 +273,7 @@ const githubLogin = async (accessToken: string, res: Response) => {
         name: userInfo.name,
         password: '',
         bio: userInfo.bio,
-        avatarType: AvatarType.UPLOAD,
+        avatarType: "upload",
         avatarData: userInfo.avatar_url,
       },
     });

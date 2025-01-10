@@ -2,7 +2,7 @@
   "name": "Node.js & MySQL",
   "dockerComposeFile": "docker-compose.yaml",
   "service": "app",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/ressources",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,15 +12,19 @@
       ]
     }
   },
-  "forwardPorts": [3000, 3306, 5173],
+  "forwardPorts": [3001, 3306, 5173],
   "postCreateCommand": "cd frontend && npm install && cd ../backend && npm install",
   "portsAttributes": {
     "5173": {
       "label": "Frontend",
       "onAutoForward": "notify"
     },
-    "3000": {
+    "3001": {
       "label": "Backend",
+      "onAutoForward": "notify"
+    },
+    "3306":{
+      "label": "MySQL",
       "onAutoForward": "notify"
     }
   }
