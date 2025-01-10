@@ -13,5 +13,15 @@
     }
   },
   "forwardPorts": [3000, 3306, 5173],
-  "postCreateCommand": "cd frontend && npm install && cd ../backend && npm install"
+  "postCreateCommand": "cd frontend && npm install && cd ../backend && npm install",
+  "portsAttributes": {
+    "5173": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Backend",
+      "onAutoForward": "notify"
+    }
+  }
 }
